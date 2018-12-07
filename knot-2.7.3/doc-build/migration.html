@@ -1,0 +1,238 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Migration &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Appendices" href="appendices.html" />
+    <link rel="prev" title="kzonecheck – Knot DNS zone file checking tool" href="man_kzonecheck.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="appendices.html" title="Appendices"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="man_kzonecheck.html" title="kzonecheck – Knot DNS zone file checking tool"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="migration">
+<span id="id1"></span><h1>Migration<a class="headerlink" href="#migration" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="upgrade-2-4-x-to-2-5-x">
+<span id="id2"></span><h2>Upgrade 2.4.x to 2.5.x<a class="headerlink" href="#upgrade-2-4-x-to-2-5-x" title="Permalink to this headline">¶</a></h2>
+<p>This chapter describes some steps necessary after upgrading Knot DNS from
+version 2.4.x to 2.5.x.</p>
+<div class="section" id="building-changes">
+<span id="id3"></span><h3>Building changes<a class="headerlink" href="#building-changes" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">--enable-dnstap</span></code> configure option now enables the dnstap support in
+kdig only! To build the dnstap query module, <code class="docutils literal notranslate"><span class="pre">--with-module-dnstap</span></code> have
+to be used.</p>
+<p>Since Knot DNS version 2.5.0 each query module can be configured to be:</p>
+<ul class="simple">
+<li>disabled: <code class="docutils literal notranslate"><span class="pre">--with-module-</span></code>MODULE_NAME<code class="docutils literal notranslate"><span class="pre">=no</span></code></li>
+<li>embedded: <code class="docutils literal notranslate"><span class="pre">--with-module-</span></code>MODULE_NAME<code class="docutils literal notranslate"><span class="pre">=yes</span></code></li>
+<li>external: <code class="docutils literal notranslate"><span class="pre">--with-module-</span></code>MODULE_NAME<code class="docutils literal notranslate"><span class="pre">=shared</span></code> (excluding
+<code class="docutils literal notranslate"><span class="pre">dnsproxy</span></code> and <code class="docutils literal notranslate"><span class="pre">onlinesign</span></code>)</li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">--with-timer-mapsize</span></code> configure option was replaced with the runtime
+<a class="reference internal" href="reference.html#template-max-timer-db-size"><span class="std std-ref">max-timer-db-size</span></a> configuration option.</p>
+</div>
+<div class="section" id="kasp-db-migration">
+<span id="id4"></span><h3>KASP DB migration<a class="headerlink" href="#kasp-db-migration" title="Permalink to this headline">¶</a></h3>
+<p>Knot DNS version 2.4.x and earlier uses JSON files to store DNSSEC keys metadata,
+one for each zone. 2.5.x versions store those in binary format in a LMDB, all zones
+together. The migration is possible with the
+<a class="reference external" href="https://gitlab.labs.nic.cz/knot/knot-dns/blob/2.6/src/utils/pykeymgr/pykeymgr.in">pykeymgr</a>
+script:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pykeymgr -i path/to/keydir
+</pre></div>
+</div>
+<p>The path to KASP DB directory is configuration-dependent, usually it is the <code class="docutils literal notranslate"><span class="pre">keys</span></code>
+subdirectory in the zone storage.</p>
+<p>In rare installations, the JSON files might be spread across more directories. In such
+case, it is necessary to put them together into one directory and migrate at once.</p>
+</div>
+<div class="section" id="configuration-changes">
+<span id="configuration-changes-2-5"></span><h3>Configuration changes<a class="headerlink" href="#configuration-changes" title="Permalink to this headline">¶</a></h3>
+<p>It is no longer possible to configure KASP DB per zone or in a non-default
+template. Ensure just one common KASP DB configuration in the default
+template.</p>
+<p>As Knot DNS version 2.5.0 brings dynamically loaded modules, some modules
+were renamed for technical reasons. So it is necessary to rename all
+occurrences (module section names and references from zones or templates)
+of the following module names in the configuration:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mod-online-sign -&gt; mod-onlinesign
+
+mod-synth-record -&gt; mod-synthrecord
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="upgrade-2-5-x-to-2-6-x">
+<span id="id5"></span><h2>Upgrade 2.5.x to 2.6.x<a class="headerlink" href="#upgrade-2-5-x-to-2-6-x" title="Permalink to this headline">¶</a></h2>
+<p>Upgrading from Knot DNS version 2.5.x to 2.6.x is almost seamless.</p>
+<div class="section" id="configuration-changes-2-6">
+<span id="id6"></span><h3>Configuration changes<a class="headerlink" href="#configuration-changes-2-6" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">dsa</span></code> and <code class="docutils literal notranslate"><span class="pre">dsa-nsec3-sha1</span></code> algorithm values are no longer supported
+by the <a class="reference internal" href="reference.html#policy-algorithm"><span class="std std-ref">algorithm</span></a> option.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ixfr-from-differences</span></code> zone/template option was deprecated in favor of
+the <a class="reference internal" href="reference.html#zone-zonefile-load"><span class="std std-ref">zonefile-load</span></a> option.</p>
+</div>
+</div>
+<div class="section" id="upgrade-2-6-x-to-2-7-x">
+<span id="id7"></span><h2>Upgrade 2.6.x to 2.7.x<a class="headerlink" href="#upgrade-2-6-x-to-2-7-x" title="Permalink to this headline">¶</a></h2>
+<p>Upgrading from Knot DNS version 2.6.x to 2.7.x is seamless if no obsolete
+configuration or module rosedb is used.</p>
+</div>
+<div class="section" id="knot-dns-for-bind-users">
+<span id="id8"></span><h2>Knot DNS for BIND users<a class="headerlink" href="#knot-dns-for-bind-users" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="automatic-dnssec-signing">
+<span id="id9"></span><h3>Automatic DNSSEC signing<a class="headerlink" href="#automatic-dnssec-signing" title="Permalink to this headline">¶</a></h3>
+<p>Migrating automatically signed zones from BIND to Knot DNS requires copying
+up-to-date zone files from BIND, importing existing private keys, and updating
+server configuration:</p>
+<ol class="arabic">
+<li><p class="first">To obtain current content of the zone which is being migrated,
+request BIND to flush the zone into the zone file: <code class="docutils literal notranslate"><span class="pre">rndc</span> <span class="pre">flush</span>
+<span class="pre">example.com</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If dynamic updates (DDNS) are enabled for the given zone, you
+might need to freeze the zone before flushing it. That can be done
+similarly:</p>
+<div class="last highlight-none notranslate"><div class="highlight"><pre><span></span>$ rndc freeze example.com
+</pre></div>
+</div>
+</div>
+</li>
+<li><p class="first">Copy the fresh zone file into the zones <a class="reference internal" href="reference.html#zone-storage"><span class="std std-ref">storage</span></a>
+directory of Knot DNS.</p>
+</li>
+<li><p class="first">Import all existing zone keys into the KASP database. Make sure that all
+the keys were imported correctly:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ keymgr example.com. import-bind path/to/Kexample.com.+013+11111
+$ keymgr example.com. import-bind path/to/Kexample.com.+013+22222
+$ ...
+$ keymgr example.com. list
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the server configuration file or database is not at the default location,
+add a configuration parameter (-c or -C).</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The server can be run under a dedicated user account, usually <code class="docutils literal notranslate"><span class="pre">knot</span></code>.
+As the server requires read-write access to the KASP database, the
+permissions must be set correctly. This can be achieved for instance by
+executing all KASP database management commands under sudo:</p>
+<div class="last highlight-none notranslate"><div class="highlight"><pre><span></span>$ sudo -u knot keymgr ...
+</pre></div>
+</div>
+</div>
+</li>
+<li><p class="first">Follow <a class="reference internal" href="#automatic-dnssec-signing"><span class="std std-ref">Automatic DNSSEC signing</span></a> steps to configure DNSSEC signing.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Migration</a><ul>
+<li><a class="reference internal" href="#upgrade-2-4-x-to-2-5-x">Upgrade 2.4.x to 2.5.x</a><ul>
+<li><a class="reference internal" href="#building-changes">Building changes</a></li>
+<li><a class="reference internal" href="#kasp-db-migration">KASP DB migration</a></li>
+<li><a class="reference internal" href="#configuration-changes">Configuration changes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#upgrade-2-5-x-to-2-6-x">Upgrade 2.5.x to 2.6.x</a><ul>
+<li><a class="reference internal" href="#configuration-changes-2-6">Configuration changes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#upgrade-2-6-x-to-2-7-x">Upgrade 2.6.x to 2.7.x</a></li>
+<li><a class="reference internal" href="#knot-dns-for-bind-users">Knot DNS for BIND users</a><ul>
+<li><a class="reference internal" href="#automatic-dnssec-signing">Automatic DNSSEC signing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="man_kzonecheck.html"
+                        title="previous chapter">kzonecheck – Knot DNS zone file checking tool</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="appendices.html"
+                        title="next chapter">Appendices</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/migration.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="appendices.html" title="Appendices"
+             >next</a></li>
+        <li class="right" >
+          <a href="man_kzonecheck.html" title="kzonecheck – Knot DNS zone file checking tool"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

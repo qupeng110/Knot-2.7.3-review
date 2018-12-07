@@ -1,0 +1,188 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Installation &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration" href="configuration.html" />
+    <link rel="prev" title="Requirements" href="requirements.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="configuration.html" title="Configuration"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="requirements.html" title="Requirements"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installation">
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installation-from-a-package">
+<span id="id2"></span><h2>Installation from a package<a class="headerlink" href="#installation-from-a-package" title="Permalink to this headline">¶</a></h2>
+<p>Knot DNS may already be included in your operating system distribution and
+therefore can be installed from packages (Linux), ports (BSD), or via
+Homebrew (macOS). This is always preferred unless you want to test the latest
+features, contribute to Knot development, or you just know what you are doing.</p>
+<p>See the project <a class="reference external" href="https://www.knot-dns.cz/download">download</a> page for
+the latest information.</p>
+</div>
+<div class="section" id="installation-from-source-code">
+<span id="id3"></span><h2>Installation from source code<a class="headerlink" href="#installation-from-source-code" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="required-build-environment">
+<h3>Required build environment<a class="headerlink" href="#required-build-environment" title="Permalink to this headline">¶</a></h3>
+<p>The build process relies on these standard tools:</p>
+<ul class="simple">
+<li>make</li>
+<li>libtool</li>
+<li>pkg-config</li>
+<li>autoconf &gt;= 2.65</li>
+<li>python-sphinx (optional, for documentation building)</li>
+</ul>
+<p>GCC at least 4.1 is strictly required for atomic built-ins, but the latest
+available version is recommended. Another requirements <code class="docutils literal notranslate"><span class="pre">_GNU_SOURCE</span></code>
+and C99 support, otherwise it adapts to the compiler available features.
+LLVM clang compiler since version 2.9 can be used as well.</p>
+</div>
+<div class="section" id="getting-the-source-code">
+<h3>Getting the source code<a class="headerlink" href="#getting-the-source-code" title="Permalink to this headline">¶</a></h3>
+<p>You can find the source code for the latest release on <a class="reference external" href="https://www.knot-dns.cz">www.knot-dns.cz</a>.
+Alternatively, you can fetch the whole project from the git repository
+<a class="reference external" href="https://gitlab.labs.nic.cz/knot/knot-dns">https://gitlab.labs.nic.cz/knot/knot-dns.git</a>.</p>
+<p>After obtaining the source code, compilation and installation is a quite
+straightforward process using autotools.</p>
+</div>
+<div class="section" id="configuring-and-generating-makefiles">
+<span id="id4"></span><h3>Configuring and generating Makefiles<a class="headerlink" href="#configuring-and-generating-makefiles" title="Permalink to this headline">¶</a></h3>
+<p>If compiling from the git source, you need to bootstrap the <code class="docutils literal notranslate"><span class="pre">./configure</span></code> file first:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> autoreconf -i -f
+</pre></div>
+</div>
+<p>In most cases, you can just run configure without any options:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> ./configure
+</pre></div>
+</div>
+<p>For all available configure options run:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> ./configure --help
+</pre></div>
+</div>
+</div>
+<div class="section" id="compilation">
+<h3>Compilation<a class="headerlink" href="#compilation" title="Permalink to this headline">¶</a></h3>
+<p>After running <code class="docutils literal notranslate"><span class="pre">./configure</span></code> you can compile Knot DNS by running
+<code class="docutils literal notranslate"><span class="pre">make</span></code> command, which will produce binaries and other related
+files:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> make
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The compilation with enabled optimizations may take a long time. In such
+a case the <code class="docutils literal notranslate"><span class="pre">--disable-fastparser</span></code> configure option can help.</p>
+</div>
+</div>
+<div class="section" id="id5">
+<h3>Installation<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>When you have finished building Knot DNS, it’s time to install the
+binaries and configuration files into the operation system hierarchy.
+You can do so by executing:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> make install
+</pre></div>
+</div>
+<p>When installing as a non-root user, you might have to gain elevated privileges by
+switching to root user, e.g. <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">install</span></code> or <code class="docutils literal notranslate"><span class="pre">su</span> <span class="pre">-c</span> <span class="pre">'make</span> <span class="pre">install'</span></code>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#installation-from-a-package">Installation from a package</a></li>
+<li><a class="reference internal" href="#installation-from-source-code">Installation from source code</a><ul>
+<li><a class="reference internal" href="#required-build-environment">Required build environment</a></li>
+<li><a class="reference internal" href="#getting-the-source-code">Getting the source code</a></li>
+<li><a class="reference internal" href="#configuring-and-generating-makefiles">Configuring and generating Makefiles</a></li>
+<li><a class="reference internal" href="#compilation">Compilation</a></li>
+<li><a class="reference internal" href="#id5">Installation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="requirements.html"
+                        title="previous chapter">Requirements</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="configuration.html"
+                        title="next chapter">Configuration</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/installation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="configuration.html" title="Configuration"
+             >next</a></li>
+        <li class="right" >
+          <a href="requirements.html" title="Requirements"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

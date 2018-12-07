@@ -1,0 +1,365 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>kdig – Advanced DNS lookup utility &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="keymgr – Key management utility" href="man_keymgr.html" />
+    <link rel="prev" title="Utilities" href="utilities.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="man_keymgr.html" title="keymgr – Key management utility"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="utilities.html" title="Utilities"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="utilities.html" accesskey="U">Utilities</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="kdig-advanced-dns-lookup-utility">
+<h1>kdig – Advanced DNS lookup utility<a class="headerlink" href="#kdig-advanced-dns-lookup-utility" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><strong class="program">kdig</strong> [<em>common-settings</em>] [<em>query</em> [<em>settings</em>]]…</p>
+<p><strong class="program">kdig</strong> <strong>-h</strong></p>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>This utility sends one or more DNS queries to a nameserver. Each query can have
+individual <em>settings</em>, or it can be specified globally via <em>common-settings</em>,
+which must precede <em>query</em> specification.</p>
+<div class="section" id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><em>query</em></dt>
+<dd><em>name</em> | <strong>-q</strong> <em>name</em> | <strong>-x</strong> <em>address</em> | <strong>-G</strong> <em>tapfile</em></dd>
+<dt><em>common-settings</em>, <em>settings</em></dt>
+<dd>[<em>query_class</em>] [<em>query_type</em>] [<strong>&#64;</strong><em>server</em>]… [<em>options</em>]</dd>
+<dt><em>name</em></dt>
+<dd>Is a domain name that is to be looked up.</dd>
+<dt><em>server</em></dt>
+<dd>Is a domain name or an IPv4 or IPv6 address of the nameserver to send a query
+to. An additional port can be specified using address:port ([address]:port
+for IPv6 address), address&#64;port, or address#port notation. If no server is
+specified, the servers from <code class="file docutils literal notranslate"><span class="pre">/etc/resolv.conf</span></code> are used.</dd>
+</dl>
+<p>If no arguments are provided, <strong class="program">kdig</strong> sends NS query for the root
+zone.</p>
+</div>
+<div class="section" id="query-classes">
+<h3>Query classes<a class="headerlink" href="#query-classes" title="Permalink to this headline">¶</a></h3>
+<p>A <em>query_class</em> can be either a DNS class name (IN, CH) or generic class
+specification <strong>CLASS</strong><em>XXXXX</em> where <em>XXXXX</em> is a corresponding decimal
+class number. The default query class is IN.</p>
+</div>
+<div class="section" id="query-types">
+<h3>Query types<a class="headerlink" href="#query-types" title="Permalink to this headline">¶</a></h3>
+<p>A <em>query_type</em> can be either a DNS resource record type
+(A, AAAA, NS, SOA, DNSKEY, ANY, etc.) or one of the following:</p>
+<dl class="docutils">
+<dt><strong>TYPE</strong><em>XXXXX</em></dt>
+<dd>Generic query type specification where <em>XXXXX</em> is a corresponding decimal
+type number.</dd>
+<dt><strong>AXFR</strong></dt>
+<dd>Full zone transfer request.</dd>
+<dt><strong>IXFR=</strong><em>serial</em></dt>
+<dd>Incremental zone transfer request for specified starting SOA serial number.</dd>
+<dt><strong>NOTIFY=</strong><em>serial</em></dt>
+<dd>Notify message with a SOA serial hint specified.</dd>
+<dt><strong>NOTIFY</strong></dt>
+<dd>Notify message with a SOA serial hint unspecified.</dd>
+</dl>
+<p>The default query type is A.</p>
+</div>
+<div class="section" id="options">
+<h3>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>-4</strong></dt>
+<dd>Use the IPv4 protocol only.</dd>
+<dt><strong>-6</strong></dt>
+<dd>Use the IPv6 protocol only.</dd>
+<dt><strong>-b</strong> <em>address</em></dt>
+<dd>Set the source IP address of the query to <em>address</em>. The address must be a
+valid address for local interface or :: or 0.0.0.0. An optional port
+can be specified in the same format as the <em>server</em> value.</dd>
+<dt><strong>-c</strong> <em>class</em></dt>
+<dd>An explicit <em>query_class</em> specification. See possible values above.</dd>
+<dt><strong>-d</strong></dt>
+<dd>Enable debug messages.</dd>
+<dt><strong>-h</strong>, <strong>–help</strong></dt>
+<dd>Print the program help.</dd>
+<dt><strong>-k</strong> <em>keyfile</em></dt>
+<dd>Use the TSIG key stored in a file <em>keyfile</em> to authenticate the request. The
+file must contain the key in the same format as accepted by the
+<strong>-y</strong> option.</dd>
+<dt><strong>-p</strong> <em>port</em></dt>
+<dd>Set the nameserver port number or service name to send a query to. The default
+port is 53.</dd>
+<dt><strong>-q</strong> <em>name</em></dt>
+<dd>Set the query name. An explicit variant of <em>name</em> specification. If no <em>name</em>
+is provided, empty question section is set.</dd>
+<dt><strong>-t</strong> <em>type</em></dt>
+<dd>An explicit <em>query_type</em> specification. See possible values above.</dd>
+<dt><strong>-V</strong>, <strong>–version</strong></dt>
+<dd>Print the program version.</dd>
+<dt><strong>-x</strong> <em>address</em></dt>
+<dd>Send a reverse (PTR) query for IPv4 or IPv6 <em>address</em>. The correct name, class
+and type is set automatically.</dd>
+<dt><strong>-y</strong> [<em>alg</em>:]<em>name</em>:<em>key</em></dt>
+<dd>Use the TSIG key named <em>name</em> to authenticate the request. The <em>alg</em>
+part specifies the algorithm (the default is hmac-sha256) and <em>key</em> specifies
+the shared secret encoded in Base64.</dd>
+<dt><strong>-E</strong> <em>tapfile</em></dt>
+<dd>Export a dnstap trace of the query and response messages received to the
+file <em>tapfile</em>.</dd>
+<dt><strong>-G</strong> <em>tapfile</em></dt>
+<dd>Generate message output from a previously saved dnstap file <em>tapfile</em>.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>multiline</strong></dt>
+<dd>Wrap long records to more lines and improve human readability.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>short</strong></dt>
+<dd>Show record data only.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>generic</strong></dt>
+<dd>Use the generic representation format when printing resource record types
+and data.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>crypto</strong></dt>
+<dd>Display the DNSSEC keys and signatures values in hexdump, instead of omitting them.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>aaflag</strong></dt>
+<dd>Set the AA flag.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>tcflag</strong></dt>
+<dd>Set the TC flag.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>rdflag</strong></dt>
+<dd>Set the RD flag.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>recurse</strong></dt>
+<dd>Same as <strong>+</strong>[<strong>no</strong>]<strong>rdflag</strong></dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>raflag</strong></dt>
+<dd>Set the RA flag.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>zflag</strong></dt>
+<dd>Set the zero flag bit.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>adflag</strong></dt>
+<dd>Set the AD flag.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>cdflag</strong></dt>
+<dd>Set the CD flag.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>dnssec</strong></dt>
+<dd>Set the DO flag.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>all</strong></dt>
+<dd>Show all packet sections.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>qr</strong></dt>
+<dd>Show the query packet.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>header</strong></dt>
+<dd>Show the packet header.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>opt</strong></dt>
+<dd>Show the EDNS pseudosection.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>question</strong></dt>
+<dd>Show the question section.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>answer</strong></dt>
+<dd>Show the answer section.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>authority</strong></dt>
+<dd>Show the authority section.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>additional</strong></dt>
+<dd>Show the additional section.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>tsig</strong></dt>
+<dd>Show the TSIG pseudosection.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>stats</strong></dt>
+<dd>Show trailing packet statistics.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>class</strong></dt>
+<dd>Show the DNS class.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>ttl</strong></dt>
+<dd>Show the TTL value.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>tcp</strong></dt>
+<dd>Use the TCP protocol (default is UDP for standard query and TCP for AXFR/IXFR).</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>fastopen</strong></dt>
+<dd>Use TCP Fast Open (default with TCP).</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>ignore</strong></dt>
+<dd>Don’t use TCP automatically if a truncated reply is received.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>tls</strong></dt>
+<dd>Use TLS with the Opportunistic privacy profile (<span class="target" id="index-0"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc7858.html#section-4.1"><strong>RFC 7858#section-4.1</strong></a>).</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>tls-ca</strong>[=<em>FILE</em>]</dt>
+<dd>Use TLS with a certificate validation. Certification authority certificates
+are loaded from the specified PEM file (default is system certificate storage
+if no argument is provided).
+Can be specified multiple times. If the +tls-hostname option is not provided,
+the name of the target server (if specified) is used for strict authentication.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>tls-pin</strong>=<em>BASE64</em></dt>
+<dd>Use TLS with the Out-of-Band key-pinned privacy profile (<span class="target" id="index-1"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc7858.html#section-4.2"><strong>RFC 7858#section-4.2</strong></a>).
+The PIN must be a Base64 encoded SHA-256 hash of the X.509 SubjectPublicKeyInfo.
+Can be specified multiple times.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>tls-hostname</strong>=<em>STR</em></dt>
+<dd>Use TLS with a remote server hostname check.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>nsid</strong></dt>
+<dd>Request the nameserver identifier (NSID).</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>bufsize</strong>=<em>B</em></dt>
+<dd>Set EDNS buffer size in bytes (default is 512 bytes).</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>padding</strong>[=<em>B</em>]</dt>
+<dd>Use EDNS(0) padding option to pad queries, optionally to a specific
+size. The default is to pad queries with a sensible amount when using
++tls, and not to pad at all when queries are sent without TLS.  With
+no argument (i.e., just +padding) pad every query with a sensible
+amount regardless of the use of TLS. With +nopadding, never pad.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>alignment</strong>[=<em>B</em>]</dt>
+<dd>Align the query to B-byte-block message using the EDNS(0) padding option
+(default is no or 128 if no argument is specified).</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>subnet</strong>=<em>SUBN</em></dt>
+<dd>Set EDNS(0) client subnet SUBN=addr/prefix.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>edns</strong>[=<em>N</em>]</dt>
+<dd>Use EDNS version (default is 0).</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>time</strong>=<em>T</em></dt>
+<dd>Set the wait-for-reply interval in seconds (default is 5 seconds). This timeout
+applies to each query attempt.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>retry</strong>=<em>N</em></dt>
+<dd>Set the number (&gt;=0) of UDP retries (default is 2). This doesn’t apply to
+AXFR/IXFR.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>cookie</strong>=<em>HEX</em></dt>
+<dd>Attach EDNS(0) cookie to the query.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>badcookie</strong></dt>
+<dd>Repeat a query with the correct cookie.</dd>
+<dt><strong>+</strong>[<strong>no</strong>]<strong>ednsopt</strong>[=<em>CODE</em>[:<em>HEX</em>]]</dt>
+<dd>Send custom EDNS option. The <em>CODE</em> is EDNS option code in decimal, <em>HEX</em>
+is an optional hex encoded string to use as EDNS option value. This argument
+can be used multiple times. +noednsopt clears all EDNS options specified by
++ednsopt.</dd>
+<dt><strong>+noidn</strong></dt>
+<dd>Disable the IDN transformation to ASCII and vice versa. IDNA2003 support depends
+on libidn availability during project building!</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<p>Options <strong>-k</strong> and <strong>-y</strong> can not be used simultaneously.</p>
+<p>Dnssec-keygen keyfile format is not supported. Use <em class="manpage">keymgr(8)</em> instead.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Get A records for example.com:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> kdig example.com A
+</pre></div>
+</div>
+</li>
+<li><p class="first">Perform AXFR for zone example.com from the server 192.0.2.1:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> kdig example.com -t AXFR @192.0.2.1
+</pre></div>
+</div>
+</li>
+<li><p class="first">Get A records for example.com from 192.0.2.1 and reverse lookup for address
+2001:DB8::1 from 192.0.2.2. Both using the TCP protocol:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> kdig +tcp example.com -t A @192.0.2.1 -x <span class="m">2001</span>:DB8::1 @192.0.2.2
+</pre></div>
+</div>
+</li>
+<li><p class="first">Get SOA record for example.com, use TLS, use system certificates, check
+for specified hostname, check for certificate pin, and print additional
+debug info:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> kdig -d @185.49.141.38 +tls-ca +tls-host<span class="o">=</span>getdnsapi.net <span class="se">\</span>
+  +tls-pin<span class="o">=</span>foxZRnIh9gZpWnl+zEiKa0EJ2rdCGroMWm02gaxSc9S<span class="o">=</span> soa example.com
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="files">
+<h2>Files<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h2>
+<p><code class="file docutils literal notranslate"><span class="pre">/etc/resolv.conf</span></code></p>
+</div>
+<div class="section" id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<p><em class="manpage">khost(1)</em>, <em class="manpage">knsupdate(1)</em>, <em class="manpage">keymgr(8)</em>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">kdig – Advanced DNS lookup utility</a><ul>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a><ul>
+<li><a class="reference internal" href="#parameters">Parameters</a></li>
+<li><a class="reference internal" href="#query-classes">Query classes</a></li>
+<li><a class="reference internal" href="#query-types">Query types</a></li>
+<li><a class="reference internal" href="#options">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#notes">Notes</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#files">Files</a></li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="utilities.html"
+                        title="previous chapter">Utilities</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="man_keymgr.html"
+                        title="next chapter">keymgr – Key management utility</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/man_kdig.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="man_keymgr.html" title="keymgr – Key management utility"
+             >next</a></li>
+        <li class="right" >
+          <a href="utilities.html" title="Utilities"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="utilities.html" >Utilities</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

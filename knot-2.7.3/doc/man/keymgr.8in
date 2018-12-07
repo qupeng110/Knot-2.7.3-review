@@ -1,0 +1,282 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "KEYMGR" "8" "@RELEASE_DATE@" "@VERSION@" "Knot DNS"
+.SH NAME
+keymgr \- Knot DNS key management utility
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH SYNOPSIS
+.sp
+\fBkeymgr\fP \fIbasic_option\fP [\fIparameters\fP\&...]
+.sp
+\fBkeymgr\fP [\fIconfig_option\fP \fIconfig_storage\fP] \fIzone\fP \fIcommand\fP \fIargument\fP\&...
+.SH DESCRIPTION
+.sp
+The \fBkeymgr\fP utility serves for manual key management in Knot DNS server.
+.sp
+Functions for DNSSEC keys and KASP (Key And Signature Policy)
+management are provided.
+.sp
+The DNSSEC and KASP configuration is stored in a so called KASP database.
+The database is backed by LMDB.
+.SS Basic options
+.INDENT 0.0
+.TP
+\fB\-h\fP, \fB\-\-help\fP
+Print the program help.
+.TP
+\fB\-V\fP, \fB\-\-version\fP
+Print the program version.
+.TP
+\fB\-t\fP, \fB\-\-tsig\fP \fItsig_name\fP [\fItsig_algorithm\fP] [\fItsig_bits\fP]
+Generates a TSIG key. TSIG algorithm can be specified by string (default: hmac\-sha256),
+bit length of the key by number (default: optimal length given by algorithm). The generated
+TSIG key is only displayed on \fIstdout\fP: the command does not create a file, nor include the
+key in a keystore.
+.UNINDENT
+.SS Config options
+.INDENT 0.0
+.TP
+\fB\-c\fP, \fB\-\-config\fP \fIfile\fP
+Use a textual configuration file (default is \fB@config_dir@/knot.conf\fP).
+.TP
+\fB\-C\fP, \fB\-\-confdb\fP \fIdirectory\fP
+Use a binary configuration database directory (default is \fB@storage_dir@/confdb\fP).
+The default configuration database, if exists, has a preference to the default
+configuration file.
+.TP
+\fB\-d\fP, \fB\-\-dir\fP \fIpath\fP
+Use specified KASP database path and default configuration.
+.UNINDENT
+.SS Commands
+.INDENT 0.0
+.TP
+\fBlist\fP [\fItimestamp_format\fP]
+Prints the list of key IDs and parameters of keys belonging to the zone.
+.TP
+\fBgenerate\fP [\fIarguments\fP\&...]
+Generates new DNSSEC key and stores it in KASP database. Prints the key ID.
+This action takes some number of arguments (see below). Values for unspecified arguments are taken
+from corresponding policy (if \fI\-c\fP or \fI\-C\fP options used) or from Knot policy defaults.
+.TP
+\fBimport\-bind\fP \fIBIND_key_file\fP
+Imports a BIND\-style key into KASP database (converting it to PEM format).
+Takes one argument: path to BIND key file (private or public, but both MUST exist).
+.TP
+\fBimport\-pub\fP \fIBIND_pubkey_file\fP
+Imports a public key into KASP database. This key won\(aqt be rollovered nor used for signing.
+Takes one argument: path to BIND public key file.
+.TP
+\fBimport\-pem\fP \fIPEM_file\fP [\fIarguments\fP\&...]
+Imports a DNSSEC key from PEM file. The key parameters (same as for the generate action) need to be
+specified (mainly algorithm, timers...) because they are not contained in the PEM format.
+.TP
+\fBimport\-pkcs11\fP \fIkey_id\fP [\fIarguments\fP\&...]
+Imports a DNSSEC key from PKCS #11 storage. The key parameters (same as for the generate action) need to be
+specified (mainly algorithm, timers...) because they are not available. In fact, no key
+data is imported, only KASP database metadata is created.
+.TP
+\fBset\fP \fIkey_spec\fP [\fIarguments\fP\&...]
+Changes a timing argument (or ksk/zsk) of an existing key to a new value. \fIKey_spec\fP is either the
+key tag or a prefix of the key ID; \fIarguments\fP are like for \fBgenerate\fP, but just the related ones.
+.TP
+\fBds\fP [\fIkey_spec\fP]
+Generate DS record (all digest algorithms together) for specified key. \fIKey_spec\fP
+is like for \fBset\fP, if unspecified, all KSKs are used.
+.TP
+\fBdnskey\fP [\fIkey_spec\fP]
+Generate DNSKEY record for specified key. \fIKey_spec\fP
+is like for \fBds\fP, if unspecified, all KSKs are used.
+.TP
+\fBdelete\fP \fIkey_spec\fP
+Remove the specified key from zone. If the key was not shared, it is also deleted from keystore.
+.TP
+\fBshare\fP \fIkey_ID\fP
+Import a key (specified by full key ID) from another zone as shared. After this, the key is
+owned by both zones equally.
+.UNINDENT
+.SS Generate arguments
+.sp
+Arguments are separated by space, each of them is in format \(aqname=value\(aq.
+.INDENT 0.0
+.TP
+\fBalgorithm\fP
+Either an algorithm number (e.g. 14), or text name without dashes (e.g. ECDSAP384SHA384).
+.TP
+\fBsize\fP
+Key length in bits.
+.TP
+\fBksk\fP
+If set to \fByes\fP, the key will be used for signing DNSKEY rrset. The generated key will also
+have the Secure Entry Point flag set to 1.
+.TP
+\fBzsk\fP
+If set to \fByes\fP, the key will be used for signing zone (except DNSKEY rrset). This flag can
+be set concurrently with the \fBksk\fP flag.
+.TP
+\fBsep\fP
+Overrides the standard setting of the Secure Entry Point flag for the generated key.
+.UNINDENT
+.sp
+The following arguments are timestamps of key lifetime:
+.INDENT 0.0
+.TP
+\fBcreated\fP
+Key created.
+.TP
+\fBpre_active\fP
+Key started to be used for signing, not published (only for algorithm rollover).
+.TP
+\fBpublish\fP
+Key published.
+.TP
+\fBready\fP
+Key used for signing and submitted to the parent zone (only for KSK).
+.TP
+\fBactive\fP
+Key used for signing.
+.TP
+\fBpost_active\fP
+Key still used for singing, but another key is active (only for KSK).
+.TP
+\fBretire_active\fP
+Key no longer published, but still used for signing (only for algorithm rollover).
+.TP
+\fBretire\fP
+Key still published, but no longer used for signing.
+.TP
+\fBremove\fP
+Key deleted.
+.UNINDENT
+.SS Timestamps
+.INDENT 0.0
+.TP
+0
+Zero timestamp means infinite future.
+.TP
+\fIUNIX_time\fP
+Positive number of seconds since 1970 UTC.
+.TP
+\fIYYYYMMDDHHMMSS\fP
+Date and time in this format without any punctuation.
+.TP
+\fIrelative_timestamp\fP
+A sign character (\fB+\fP, \fB\-\fP), a number, and an optional time unit
+(\fBy\fP, \fBmo\fP, \fBd\fP, \fBh\fP, \fBmi\fP, \fBs\fP). The default unit is one second.
+E.g. +1mi, \-2mo.
+.UNINDENT
+.SS Output timestamp formats
+.INDENT 0.0
+.TP
+(none)
+The timestamps are printed as UNIX timestamp.
+.TP
+\fBhuman\fP
+The timestamps are printed relatively to now using time units (e.g. \-2y5mo, +1h13s).
+.TP
+\fBiso\fP
+The timestamps are printed in the ISO8601 format (e.g. 2016\-12\-31T23:59:00).
+.UNINDENT
+.SH EXAMPLES
+.INDENT 0.0
+.IP 1. 3
+Generate new TSIG key:
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ keymgr \-t my_name hmac\-sha384
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.IP 2. 3
+Generate new DNSSEC key:
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ keymgr example.com. generate algorithm=ECDSAP256SHA256 size=256 \e
+  ksk=true created=1488034625 publish=20170223205611 retire=+10mo remove=+1y
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.IP 3. 3
+Import a DNSSEC key from BIND:
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ keymgr example.com. import\-bind ~/bind/Kharbinge4d5.+007+63089.key
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.IP 4. 3
+Configure key timing:
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ keymgr example.com. set 4208 active=+2mi retire=+4mi remove=+5mi
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.IP 5. 3
+Share a KSK from another zone:
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ keymgr example.com. share e687cf927029e9db7184d2ece6d663f5d1e5b0e9
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.SH SEE ALSO
+.sp
+\fI\%RFC 6781\fP \- DNSSEC Operational Practices.
+\fI\%RFC 7583\fP \- DNSSEC Key Rollover Timing Considerations.
+.sp
+\fBknot.conf(5)\fP,
+\fBknotc(8)\fP,
+\fBknotd(8)\fP\&.
+.SH AUTHOR
+CZ.NIC Labs <http://www.knot-dns.cz>
+.SH COPYRIGHT
+Copyright 2010–2018, CZ.NIC, z.s.p.o.
+.\" Generated by docutils manpage writer.
+.

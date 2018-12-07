@@ -1,0 +1,161 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>kjournalprint – Knot DNS journal print utility &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="knotc – Knot DNS control utility" href="man_knotc.html" />
+    <link rel="prev" title="khost – Simple DNS lookup utility" href="man_khost.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="man_knotc.html" title="knotc – Knot DNS control utility"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="man_khost.html" title="khost – Simple DNS lookup utility"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="utilities.html" accesskey="U">Utilities</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="kjournalprint-knot-dns-journal-print-utility">
+<h1>kjournalprint – Knot DNS journal print utility<a class="headerlink" href="#kjournalprint-knot-dns-journal-print-utility" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><strong class="program">kjournalprint</strong> [<em>options</em>] <em>journal_db</em> <em>zone_name</em></p>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>The program prints zone history stored in a journal database. As default,
+changes are colored for terminal.</p>
+<div class="section" id="options">
+<h3>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>-l</strong>, <strong>–limit</strong> <em>limit</em></dt>
+<dd>Limits the number of displayed changes.</dd>
+<dt><strong>-d</strong>, <strong>–debug</strong></dt>
+<dd>Debug mode brief output.</dd>
+<dt><strong>-n</strong>, <strong>–no-color</strong></dt>
+<dd>Removes changes coloring.</dd>
+<dt><strong>-z</strong>, <strong>–zone-list</strong></dt>
+<dd>Instead of reading jurnal, display the list of zones in the DB.
+(<em>zone_name</em> not needed)</dd>
+<dt><strong>-h</strong>, <strong>–help</strong></dt>
+<dd>Print the program help.</dd>
+<dt><strong>-V</strong>, <strong>–version</strong></dt>
+<dd>Print the program version.</dd>
+</dl>
+</div>
+<div class="section" id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><em>journal_db</em></dt>
+<dd>A path to the journal database.</dd>
+<dt><em>zone_name</em></dt>
+<dd>A name of the zone to print the history for.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Last (most recent) 5 changes without colors:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> kjournalprint -nl <span class="m">5</span> /var/lib/knot/journal example.com.
+</pre></div>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<p><em class="manpage">knotd(8)</em>, <em class="manpage">knot.conf(5)</em>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">kjournalprint – Knot DNS journal print utility</a><ul>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a><ul>
+<li><a class="reference internal" href="#options">Options</a></li>
+<li><a class="reference internal" href="#parameters">Parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="man_khost.html"
+                        title="previous chapter">khost – Simple DNS lookup utility</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="man_knotc.html"
+                        title="next chapter">knotc – Knot DNS control utility</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/man_kjournalprint.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="man_knotc.html" title="knotc – Knot DNS control utility"
+             >next</a></li>
+        <li class="right" >
+          <a href="man_khost.html" title="khost – Simple DNS lookup utility"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="utilities.html" >Utilities</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

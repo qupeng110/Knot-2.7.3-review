@@ -1,0 +1,146 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>kzonecheck – Knot DNS zone file checking tool &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Migration" href="migration.html" />
+    <link rel="prev" title="knsupdate – Dynamic DNS update utility" href="man_knsupdate.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="migration.html" title="Migration"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="man_knsupdate.html" title="knsupdate – Dynamic DNS update utility"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="utilities.html" accesskey="U">Utilities</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="kzonecheck-knot-dns-zone-file-checking-tool">
+<h1>kzonecheck – Knot DNS zone file checking tool<a class="headerlink" href="#kzonecheck-knot-dns-zone-file-checking-tool" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><strong class="program">kzonecheck</strong> [<em>options</em>] <em>filename</em></p>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>The utility checks zone file syntax and runs semantic checks on the zone
+content. The executed checks are the same as the checks run by the Knot
+DNS server.</p>
+<p>Please, refer to the <code class="docutils literal notranslate"><span class="pre">semantic-checks</span></code> configuration option in
+<em class="manpage">knot.conf(5)</em> for the full list of available semantic checks.</p>
+<div class="section" id="options">
+<h3>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>-o</strong>, <strong>–origin</strong> <em>origin</em></dt>
+<dd>Zone origin. If not specified, the origin is determined from the file name
+(possibly removing the <code class="docutils literal notranslate"><span class="pre">.zone</span></code> suffix).</dd>
+<dt><strong>-t</strong>, <strong>–time</strong> <em>time</em></dt>
+<dd>Current time specification. Use UNIX timestamp, YYYYMMDDHHmmSS
+format, or [+/-]<em>time</em>[unit] format, where unit can be <strong>Y</strong>, <strong>M</strong>,
+<strong>D</strong>, <strong>h</strong>, <strong>m</strong>, or <strong>s</strong>. Default is current UNIX timestamp.</dd>
+<dt><strong>-v</strong>, <strong>–verbose</strong></dt>
+<dd>Enable debug output.</dd>
+<dt><strong>-h</strong>, <strong>–help</strong></dt>
+<dd>Print the program help.</dd>
+<dt><strong>-V</strong>, <strong>–version</strong></dt>
+<dd>Print the program version.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<p><em class="manpage">knotd(8)</em>, <em class="manpage">knot.conf(5)</em>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">kzonecheck – Knot DNS zone file checking tool</a><ul>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a><ul>
+<li><a class="reference internal" href="#options">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="man_knsupdate.html"
+                        title="previous chapter">knsupdate – Dynamic DNS update utility</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="migration.html"
+                        title="next chapter">Migration</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/man_kzonecheck.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="migration.html" title="Migration"
+             >next</a></li>
+        <li class="right" >
+          <a href="man_knsupdate.html" title="knsupdate – Dynamic DNS update utility"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="utilities.html" >Utilities</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

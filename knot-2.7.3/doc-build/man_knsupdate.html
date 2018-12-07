@@ -1,0 +1,247 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>knsupdate – Dynamic DNS update utility &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="kzonecheck – Knot DNS zone file checking tool" href="man_kzonecheck.html" />
+    <link rel="prev" title="knsec3hash – NSEC hash computation utility" href="man_knsec3hash.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="man_kzonecheck.html" title="kzonecheck – Knot DNS zone file checking tool"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="man_knsec3hash.html" title="knsec3hash – NSEC hash computation utility"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="utilities.html" accesskey="U">Utilities</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="knsupdate-dynamic-dns-update-utility">
+<h1>knsupdate – Dynamic DNS update utility<a class="headerlink" href="#knsupdate-dynamic-dns-update-utility" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><strong class="program">knsupdate</strong> [<em>options</em>] [<em>filename</em>]</p>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>This utility sends Dynamic DNS update messages to a DNS server. Update content
+is read from a file (if the parameter <em>filename</em> is given) or from the standard
+input.</p>
+<p>The format of updates is textual and is made up of commands. Every command is
+placed on the separate line of the input. Lines starting with a semicolon are
+comments and are not processed.</p>
+<div class="section" id="options">
+<h3>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>-d</strong></dt>
+<dd>Enable debug messages.</dd>
+<dt><strong>-h</strong>, <strong>–help</strong></dt>
+<dd>Print the program help.</dd>
+<dt><strong>-k</strong> <em>keyfile</em></dt>
+<dd>Use the TSIG key stored in a file <em>keyfile</em> to authenticate the request. The
+file should contain the key in the same format, which is accepted by the
+<strong>-y</strong> option.</dd>
+<dt><strong>-p</strong> <em>port</em></dt>
+<dd>Set the port to use for connections to the server (if not explicitly specified
+in the update). The default is 53.</dd>
+<dt><strong>-r</strong> <em>retries</em></dt>
+<dd>The number of retries for UDP requests. The default is 3.</dd>
+<dt><strong>-t</strong> <em>timeout</em></dt>
+<dd>The total timeout (for all UDP update tries) of the update request in seconds.
+The default is 12. If set to zero, the timeout is infinite.</dd>
+<dt><strong>-v</strong></dt>
+<dd>Use a TCP connection.</dd>
+<dt><strong>-V</strong>, <strong>–version</strong></dt>
+<dd>Print the program version.</dd>
+<dt><strong>-y</strong> [<em>alg</em>:]<em>name</em>:<em>key</em></dt>
+<dd>Use the TSIG key with a name <em>name</em> to authenticate the request. The <em>alg</em>
+part specifies the algorithm (the default is hmac-sha256) and <em>key</em> specifies
+the shared secret encoded in Base64.</dd>
+</dl>
+</div>
+<div class="section" id="commands">
+<h3>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>server</strong> <em>name</em> [<em>port</em>]</dt>
+<dd>Specifies a receiving server of the dynamic update message. The <em>name</em> parameter
+can be either a host name or an IP address. If the <em>port</em> is not specified,
+the default port is used. The default port value can be controlled using
+the <strong>-p</strong> program option.</dd>
+<dt><strong>local</strong> <em>address</em> [<em>port</em>]</dt>
+<dd>Specifies outgoing <em>address</em> and <em>port</em>. If no local is specified, the
+address and port are set by the system automatically. The default port number
+is 0.</dd>
+<dt><strong>zone</strong> <em>name</em></dt>
+<dd>Specifies that all updates are done within a zone <em>name</em>. If not used,
+the default zone is the root zone.</dd>
+<dt><strong>origin</strong> <em>name</em></dt>
+<dd>Specifies fully qualified domain name suffix which is appended to non-fqd
+owners in update commands. The default origin is the root zone.</dd>
+<dt><strong>class</strong> <em>name</em></dt>
+<dd>Sets <em>name</em> as the default class for all updates. If not used, the default
+class is IN.</dd>
+<dt><strong>ttl</strong> <em>value</em></dt>
+<dd>Sets <em>value</em> as the default TTL (in seconds). If not used, the default value
+is 0.</dd>
+<dt><strong>key</strong> [<em>alg</em>:]<em>name</em> <em>key</em></dt>
+<dd>Specifies the TSIG <em>key</em> named <em>name</em> to authenticate the request. An optional
+<em>alg</em> algorithm can be specified. This command has the same effect as
+the program option <strong>-y</strong>.</dd>
+<dt>[<strong>prereq</strong>] <strong>nxdomain</strong> <em>name</em></dt>
+<dd>Adds a prerequisite for a non-existing record owned by <em>name</em>.</dd>
+<dt>[<strong>prereq</strong>] <strong>yxdomain</strong> <em>name</em></dt>
+<dd>Adds a prerequisite for an existing record owned by <em>name</em>.</dd>
+<dt>[<strong>prereq</strong>] <strong>nxrrset</strong> <em>name</em> [<em>class</em>] <em>type</em></dt>
+<dd>Adds a prerequisite for a non-existing record of the <em>type</em> owned by <em>name</em>.
+Internet <em>class</em> is expected.</dd>
+<dt>[<strong>prereq</strong>] <strong>yxrrset</strong> <em>name</em> [<em>class</em>] <em>type</em> [<em>data</em>]</dt>
+<dd>Adds a prerequisite for an existing record of the <em>type</em> owned by <em>name</em>
+with optional <em>data</em>. Internet <em>class</em> is expected.</dd>
+<dt>[<strong>update</strong>] <strong>add</strong> <em>name</em> [<em>ttl</em>] [<em>class</em>] <em>type</em> <em>data</em></dt>
+<dd>Adds a request to add a new resource record into the zone.
+Please note that if the <em>name</em> is not fully qualified domain name, the
+current origin name is appended to it.</dd>
+<dt>[<strong>update</strong>] <strong>del</strong>[<strong>ete</strong>] <em>name</em> [<em>ttl</em>] [<em>class</em>] [<em>type</em>] [<em>data</em>]</dt>
+<dd>Adds a request to remove all (or matching <em>class</em>, <em>type</em> or <em>data</em>)
+resource records from the zone. There is the same requirement for the <em>name</em>
+parameter as in <strong>update add</strong> command. The <em>ttl</em> item is ignored.</dd>
+<dt><strong>show</strong></dt>
+<dd>Displays current content of the update message.</dd>
+<dt><strong>send</strong></dt>
+<dd>Sends the current update message and cleans the list of updates.</dd>
+<dt><strong>answer</strong></dt>
+<dd>Displays the last answer from the server.</dd>
+<dt><strong>debug</strong></dt>
+<dd>Enable debugging. This command has the same meaning as the <strong>-d</strong> program option.</dd>
+<dt><strong>quit</strong></dt>
+<dd>Quit the program.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<p>Options <strong>-k</strong> and <strong>-y</strong> can not be used simultaneously.</p>
+<p>Dnssec-keygen keyfile format is not supported. Use <em class="manpage">keymgr(8)</em> instead.</p>
+<p>Zone name/server guessing is not supported if the zone name/server is not specified.</p>
+<p>Empty line doesn’t send the update.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Send one update of the zone example.com to the server 192.168.1.1. The update
+contains two new records:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knsupdate
+<span class="gp">&gt;</span> server <span class="m">192</span>.168.1.1
+<span class="gp">&gt;</span> zone example.com.
+<span class="gp">&gt;</span> origin example.com.
+<span class="gp">&gt;</span> ttl <span class="m">3600</span>
+<span class="gp">&gt;</span> add test1.example.com. <span class="m">7200</span> A <span class="m">192</span>.168.2.2
+<span class="gp">&gt;</span> add test2 TXT <span class="s2">&quot;hello&quot;</span>
+<span class="gp">&gt;</span> show
+<span class="gp">&gt;</span> send
+<span class="gp">&gt;</span> answer
+<span class="gp">&gt;</span> quit
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<p><em class="manpage">kdig(1)</em>, <em class="manpage">khost(1)</em>, <em class="manpage">keymgr(8)</em>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">knsupdate – Dynamic DNS update utility</a><ul>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a><ul>
+<li><a class="reference internal" href="#options">Options</a></li>
+<li><a class="reference internal" href="#commands">Commands</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#notes">Notes</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="man_knsec3hash.html"
+                        title="previous chapter">knsec3hash – NSEC hash computation utility</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="man_kzonecheck.html"
+                        title="next chapter">kzonecheck – Knot DNS zone file checking tool</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/man_knsupdate.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="man_kzonecheck.html" title="kzonecheck – Knot DNS zone file checking tool"
+             >next</a></li>
+        <li class="right" >
+          <a href="man_knsec3hash.html" title="knsec3hash – NSEC hash computation utility"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="utilities.html" >Utilities</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

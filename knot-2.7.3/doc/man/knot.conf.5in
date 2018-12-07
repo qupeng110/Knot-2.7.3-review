@@ -1,0 +1,1357 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "KNOT.CONF" "5" "@RELEASE_DATE@" "@VERSION@" "Knot DNS"
+.SH NAME
+knot.conf \- Knot DNS configuration file
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH DESCRIPTION
+.sp
+Configuration files for Knot DNS use simplified YAML format. Simplified means
+that not all of the features are supported.
+.sp
+For the description of configuration items, we have to declare a meaning of
+the following symbols:
+.INDENT 0.0
+.IP \(bu 2
+\fIINT\fP – Integer
+.IP \(bu 2
+\fISTR\fP – Textual string
+.IP \(bu 2
+\fIHEXSTR\fP – Hexadecimal string (with \fB0x\fP prefix)
+.IP \(bu 2
+\fIBOOL\fP – Boolean value (\fBon\fP/\fBoff\fP or \fBtrue\fP/\fBfalse\fP)
+.IP \(bu 2
+\fITIME\fP – Number of seconds, an integer with possible time multiplier suffix
+(\fBs\fP ~ 1, \fBm\fP ~ 60, \fBh\fP ~ 3600 or \fBd\fP ~ 24 * 3600)
+.IP \(bu 2
+\fISIZE\fP – Number of bytes, an integer with possible size multiplier suffix
+(\fBB\fP ~ 1, \fBK\fP ~ 1024, \fBM\fP ~ 1024^2 or \fBG\fP ~ 1024^3)
+.IP \(bu 2
+\fIBASE64\fP – Base64 encoded string
+.IP \(bu 2
+\fIADDR\fP – IPv4 or IPv6 address
+.IP \(bu 2
+\fIDNAME\fP – Domain name
+.IP \(bu 2
+\&... – Multi\-valued item, order of the values is preserved
+.IP \(bu 2
+[ ] – Optional value
+.IP \(bu 2
+| – Choice
+.UNINDENT
+.sp
+There are 12 main sections (\fBmodule\fP, \fBserver\fP, \fBcontrol\fP, \fBlog\fP,
+\fBstatistics\fP, \fBkeystore\fP, \fBpolicy\fP, \fBkey\fP, \fBacl\fP, \fBremote\fP,
+\fBtemplate\fP, and \fBzone\fP) and module sections with the \fBmod\-\fP prefix.
+Most of the sections (excluding \fBserver\fP, \fBcontrol\fP, and \fBstatistics\fP)
+are sequences of settings blocks. Each settings block begins with a unique identifier,
+which can be used as a reference from other sections (such identifier
+must be defined in advance).
+.sp
+A multi\-valued item can be specified either as a YAML sequence:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+address: [10.0.0.1, 10.0.0.2]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+or as more single\-valued items each on an extra line:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+address: 10.0.0.1
+address: 10.0.0.2
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+If an item value contains spaces or other special characters, it is necessary
+to enclose such value within double quotes \fB"\fP \fB"\fP\&.
+.SH COMMENTS
+.sp
+A comment begins with a \fB#\fP character and is ignored during processing.
+Also each configuration section or sequence block allows a permanent
+comment using the \fBcomment\fP item which is stored in the server beside the
+configuration.
+.SH INCLUDES
+.sp
+Another configuration file or files, matching a pattern, can be included at
+the top level in the current file. If the path is not absolute, then it
+is considered to be relative to the current file. The pattern can be
+an arbitrary string meeting POSIX \fIglob\fP requirements, e.g. dir/*.conf.
+Matching files are processed in sorted order.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+include: STR
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH MODULE SECTION
+.sp
+Dynamic modules loading configuration.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+If configured with non\-empty \fB\(ga\-\-with\-moduledir=path\(ga\fP parameter, all
+shared modules in this directory will be automatically loaded.
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+module:
+  \- id: STR
+    file: STR
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS id
+.sp
+A module identifier in the form of the \fBmod\-\fP prefix and module name suffix.
+.SS file
+.sp
+A path to a shared library file with the module implementation.
+.sp
+\fIDefault:\fP \fB${libdir}/knot/modules\-${version}\fP/module_name.so
+(or \fB${path}\fP/module_name.so if configured with \fB\-\-with\-moduledir=path\fP)
+.sp
+\fBWARNING:\fP
+.INDENT 0.0
+.INDENT 3.5
+If the path is not absolute, the library is searched in the set of
+system directories. See \fBman dlopen\fP for more details.
+.UNINDENT
+.UNINDENT
+.SH SERVER SECTION
+.sp
+General options related to the server.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+server:
+    identity: [STR]
+    version: [STR]
+    nsid: [STR|HEXSTR]
+    rundir: STR
+    user: STR[:STR]
+    pidfile: STR
+    udp\-workers: INT
+    tcp\-workers: INT
+    background\-workers: INT
+    async\-start: BOOL
+    tcp\-handshake\-timeout: TIME
+    tcp\-idle\-timeout: TIME
+    tcp\-reply\-timeout: TIME
+    max\-tcp\-clients: INT
+    max\-udp\-payload: SIZE
+    max\-ipv4\-udp\-payload: SIZE
+    max\-ipv6\-udp\-payload: SIZE
+    edns\-client\-subnet: BOOL
+    answer\-rotation: BOOL
+    listen: ADDR[@INT] ...
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS identity
+.sp
+An identity of the server returned in the response to the query for TXT
+record \fBid.server.\fP or \fBhostname.bind.\fP in the CHAOS class (\fI\%RFC 4892\fP).
+Set empty value to disable.
+.sp
+\fIDefault:\fP FQDN hostname
+.SS version
+.sp
+A version of the server software returned in the response to the query
+for TXT record \fBversion.server.\fP or \fBversion.bind.\fP in the CHAOS
+class (\fI\%RFC 4892\fP). Set empty value to disable.
+.sp
+\fIDefault:\fP server version
+.SS nsid
+.sp
+A DNS name server identifier (\fI\%RFC 5001\fP). Set empty value to disable.
+.sp
+\fIDefault:\fP FQDN hostname
+.SS rundir
+.sp
+A path for storing run\-time data (PID file, unix sockets, etc.).
+.sp
+\fIDefault:\fP \fB${localstatedir}/run/knot\fP (configured with \fB\-\-with\-rundir=path\fP)
+.SS user
+.sp
+A system user with an optional system group (\fBuser:group\fP) under which the
+server is run after starting and binding to interfaces. Linux capabilities
+are employed if supported.
+.sp
+\fIDefault:\fP root:root
+.SS pidfile
+.sp
+A PID file location.
+.sp
+\fIDefault:\fP \fI\%rundir\fP/knot.pid
+.SS udp\-workers
+.sp
+A number of UDP workers (threads) used to process incoming queries
+over UDP.
+.sp
+\fIDefault:\fP auto\-estimated optimal value based on the number of online CPUs
+.SS tcp\-workers
+.sp
+A number of TCP workers (threads) used to process incoming queries
+over TCP.
+.sp
+\fIDefault:\fP auto\-estimated optimal value based on the number of online CPUs
+.SS background\-workers
+.sp
+A number of workers (threads) used to execute background operations (zone
+loading, zone updates, etc.).
+.sp
+\fIDefault:\fP auto\-estimated optimal value based on the number of online CPUs
+.SS async\-start
+.sp
+If enabled, server doesn\(aqt wait for the zones to be loaded and starts
+responding immediately with SERVFAIL answers until the zone loads.
+.sp
+\fIDefault:\fP off
+.SS tcp\-handshake\-timeout
+.sp
+Maximum time between newly accepted TCP connection and the first query.
+This is useful to disconnect inactive connections faster than connections
+that already made at least 1 meaningful query.
+.sp
+\fIDefault:\fP 5
+.SS tcp\-idle\-timeout
+.sp
+Maximum idle time between requests on a TCP connection. This also limits
+receiving of a single query, each query must be received in this time limit.
+.sp
+\fIDefault:\fP 20
+.SS tcp\-reply\-timeout
+.sp
+Maximum time to wait for an outgoing connection or for a reply to an issued
+request (SOA, NOTIFY, AXFR...).
+.sp
+\fIDefault:\fP 10
+.SS max\-tcp\-clients
+.sp
+A maximum number of TCP clients connected in parallel, set this below the file
+descriptor limit to avoid resource exhaustion.
+.sp
+\fIDefault:\fP 100
+.SS max\-udp\-payload
+.sp
+Maximum EDNS0 UDP payload size default for both IPv4 and IPv6.
+.sp
+\fIDefault:\fP 4096
+.SS max\-ipv4\-udp\-payload
+.sp
+Maximum EDNS0 UDP payload size for IPv4.
+.sp
+\fIDefault:\fP 4096
+.SS max\-ipv6\-udp\-payload
+.sp
+Maximum EDNS0 UDP payload size for IPv6.
+.sp
+\fIDefault:\fP 4096
+.SS edns\-client\-subnet
+.sp
+Enable or disable EDNS Client Subnet support. If enabled, responses to queries
+containing the EDNS Client Subnet option
+always contain a valid EDNS Client Subnet option according to \fI\%RFC 7871\fP\&.
+.sp
+\fIDefault:\fP off
+.SS answer\-rotation
+.sp
+Enable or disable sorted\-rrset rotation in the answer section of normal replies.
+The rotation shift is simply determined by a query ID.
+.sp
+\fIDefault:\fP off
+.SS listen
+.sp
+One or more IP addresses where the server listens for incoming queries.
+Optional port specification (default is 53) can be appended to each address
+using \fB@\fP separator. Use \fB0.0.0.0\fP for all configured IPv4 addresses or
+\fB::\fP for all configured IPv6 addresses.
+.sp
+\fIDefault:\fP not set
+.SH KEY SECTION
+.sp
+Shared TSIG keys used to authenticate communication with the server.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+key:
+  \- id: DNAME
+    algorithm: hmac\-md5 | hmac\-sha1 | hmac\-sha224 | hmac\-sha256 | hmac\-sha384 | hmac\-sha512
+    secret: BASE64
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS id
+.sp
+A key name identifier.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+This value MUST be exactly the same as the name of the TSIG key on the
+opposite master/slave server(s).
+.UNINDENT
+.UNINDENT
+.SS algorithm
+.sp
+A key algorithm.
+.sp
+\fIDefault:\fP not set
+.SS secret
+.sp
+Shared key secret.
+.sp
+\fIDefault:\fP not set
+.SH ACL SECTION
+.sp
+Access control list rule definitions. The ACLs are used to match incoming
+connections to allow or deny requested operation (zone transfer request, DDNS
+update, etc.).
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+acl:
+  \- id: STR
+    address: ADDR[/INT] | ADDR\-ADDR ...
+    key: key_id ...
+    action: notify | transfer | update ...
+    deny: BOOL
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS id
+.sp
+An ACL rule identifier.
+.SS address
+.sp
+An ordered list of IP addresses, network subnets, or network ranges. The query
+must match one of them. Empty value means that address match is not required.
+.sp
+\fIDefault:\fP not set
+.SS key
+.sp
+An ordered list of \fI\%reference\fPs to TSIG keys. The query must
+match one of them. Empty value means that transaction authentication is not used.
+.sp
+\fIDefault:\fP not set
+.SS action
+.sp
+An ordered list of allowed (or denied) actions.
+.sp
+Possible values:
+.INDENT 0.0
+.IP \(bu 2
+\fBtransfer\fP – Allow zone transfer
+.IP \(bu 2
+\fBnotify\fP – Allow incoming notify
+.IP \(bu 2
+\fBupdate\fP – Allow zone updates
+.UNINDENT
+.sp
+\fIDefault:\fP not set
+.SS deny
+.sp
+If enabled, instead of allowing, deny the specified \fI\%action\fP,
+\fI\%address\fP, \fI\%key\fP, or combination if these
+items. If no action is specified, deny all actions.
+.sp
+\fIDefault:\fP off
+.SH CONTROL SECTION
+.sp
+Configuration of the server control interface.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+control:
+    listen: STR
+    timeout: TIME
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS listen
+.sp
+A UNIX socket path where the server listens for control commands.
+.sp
+\fIDefault:\fP \fI\%rundir\fP/knot.sock
+.SS timeout
+.sp
+Maximum time the control socket operations can take. Set 0 for infinity.
+.sp
+\fIDefault:\fP 5
+.SH STATISTICS SECTION
+.sp
+Periodic server statistics dumping.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+statistics:
+    timer: TIME
+    file: STR
+    append: BOOL
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS timer
+.sp
+A period after which all available statistics metrics will by written to the
+\fI\%file\fP\&.
+.sp
+\fIDefault:\fP not set
+.SS file
+.sp
+A file path of statistics output in the YAML format.
+.sp
+\fIDefault:\fP \fI\%rundir\fP/stats.yaml
+.SS append
+.sp
+If enabled, the output will be appended to the \fI\%file\fP
+instead of file replacement.
+.sp
+\fIDefault:\fP off
+.SH KEYSTORE SECTION
+.sp
+DNSSEC keystore configuration.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+keystore:
+  \- id: STR
+    backend: pem | pkcs11
+    config: STR
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS id
+.sp
+A keystore identifier.
+.SS backend
+.sp
+A key storage backend type. A directory with PEM files or a PKCS #11 storage.
+.sp
+\fIDefault:\fP pem
+.SS config
+.sp
+A backend specific configuration. A directory with PEM files (the path can
+be specified as a relative path to \fI\%kasp\-db\fP) or
+a configuration string for PKCS #11 storage.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Example configuration string for PKCS #11:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+"pkcs11:token=knot;pin\-value=1234 /usr/lib64/pkcs11/libsofthsm2.so"
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.sp
+\fIDefault:\fP \fI\%kasp\-db\fP/keys
+.SH SUBMISSION SECTION
+.sp
+Parameters of KSK submission checks.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+submission:
+  \- id: STR
+    parent: remote_id ...
+    check\-interval: TIME
+    timeout: TIME
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS id
+.sp
+A submission identifier.
+.SS parent
+.sp
+A list of \fI\%references\fP to parent\(aqs DNS servers to be checked for
+presence of corresponding DS records in the case of KSK submission. All of them must
+have a corresponding DS for the rollover to continue. If none is specified, the
+rollover must be pushed forward manually.
+.sp
+\fIDefault:\fP not set
+.sp
+\fBTIP:\fP
+.INDENT 0.0
+.INDENT 3.5
+A DNSSEC\-validating resolver can be set as a parent.
+.UNINDENT
+.UNINDENT
+.SS check\-interval
+.sp
+Interval for periodic checks of DS presence on parent\(aqs DNS servers, in the
+case of the KSK submission.
+.sp
+\fIDefault:\fP 1 hour
+.SS timeout
+.sp
+After this period, the KSK submission is automatically considered successful, even
+if all the checks were negative or no parents are configured. Set 0 for infinity.
+.sp
+\fIDefault:\fP 0
+.SH POLICY SECTION
+.sp
+DNSSEC policy configuration.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+policy:
+  \- id: STR
+    keystore: STR
+    manual: BOOL
+    single\-type\-signing: BOOL
+    algorithm: rsasha1 | rsasha1\-nsec3\-sha1 | rsasha256 | rsasha512 | ecdsap256sha256 | ecdsap384sha384 | ed25519
+    ksk\-size: SIZE
+    zsk\-size: SIZE
+    ksk\-shared: BOOL
+    dnskey\-ttl: TIME
+    zsk\-lifetime: TIME
+    ksk\-lifetime: TIME
+    propagation\-delay: TIME
+    rrsig\-lifetime: TIME
+    rrsig\-refresh: TIME
+    nsec3: BOOL
+    nsec3\-iterations: INT
+    nsec3\-opt\-out: BOOL
+    nsec3\-salt\-length: INT
+    nsec3\-salt\-lifetime: TIME
+    ksk\-submission: submission_id
+    cds\-cdnskey\-publish: none | delete\-dnssec | always
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS id
+.sp
+A policy identifier.
+.SS keystore
+.sp
+A \fI\%reference\fP to a keystore holding private key material
+for zones. A special \fIdefault\fP value can be used for the default keystore settings.
+.sp
+\fIDefault:\fP default
+.SS manual
+.sp
+If enabled, automatic key management is not used.
+.sp
+\fIDefault:\fP off
+.SS single\-type\-signing
+.sp
+If enabled, Single\-Type Signing Scheme is used in the automatic key management
+mode.
+.sp
+\fIDefault:\fP off
+.SS algorithm
+.sp
+An algorithm of signing keys and issued signatures.
+.sp
+\fIDefault:\fP ecdsap256sha256
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Ed25519 algorithm is only available when compiled with GnuTLS 3.6.0+.
+.UNINDENT
+.UNINDENT
+.SS ksk\-size
+.sp
+A length of newly generated KSK or
+CSK keys.
+.sp
+\fIDefault:\fP 2048 (rsa*), 256 (ecdsap256), 384 (ecdsap384), 256 (ed25519)
+.SS zsk\-size
+.sp
+A length of newly generated ZSK keys.
+.sp
+\fIDefault:\fP see default for \fI\%ksk\-size\fP
+.SS ksk\-shared
+.sp
+If enabled, all zones with this policy assigned will share one KSK.
+.sp
+\fIDefault:\fP off
+.SS dnskey\-ttl
+.sp
+A TTL value for DNSKEY records added into zone apex.
+.sp
+\fIDefault:\fP zone SOA TTL
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+has infuence over ZSK key lifetime
+.UNINDENT
+.UNINDENT
+.SS zsk\-lifetime
+.sp
+A period between ZSK publication and the next rollover initiation.
+.sp
+\fIDefault:\fP 30 days
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+ZSK key lifetime is also infuenced by propagation\-delay and dnskey\-ttl
+.sp
+Zero (aka infinity) value causes no ZSK rollover as a result.
+.UNINDENT
+.UNINDENT
+.SS ksk\-lifetime
+.sp
+A period between KSK publication and the next rollover initiation.
+.sp
+\fIDefault:\fP 0
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+KSK key lifetime is also infuenced by propagation\-delay, dnskey\-ttl,
+and KSK submission delay.
+.sp
+Zero (aka infinity) value causes no KSK rollover as a result.
+.sp
+This applies for CSK lifetime if single\-type\-signing is enabled.
+.UNINDENT
+.UNINDENT
+.SS propagation\-delay
+.sp
+An extra delay added for each key rollover step. This value should be high
+enough to cover propagation of data from the master server to all slaves.
+.sp
+\fIDefault:\fP 1 day
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+has infuence over ZSK key lifetime
+.UNINDENT
+.UNINDENT
+.SS rrsig\-lifetime
+.sp
+A validity period of newly issued signatures.
+.sp
+\fIDefault:\fP 14 days
+.SS rrsig\-refresh
+.sp
+A period how long before a signature expiration the signature will be refreshed.
+.sp
+\fIDefault:\fP 7 days
+.SS nsec3
+.sp
+Specifies if NSEC3 will be used instead of NSEC.
+.sp
+\fIDefault:\fP off
+.SS nsec3\-iterations
+.sp
+A number of additional times the hashing is performed.
+.sp
+\fIDefault:\fP 5
+.SS nsec3\-opt\-out
+.sp
+If set, NSEC3 records won\(aqt be created for insecure delegations.
+This speeds up the zone signing and reduces overall zone size.
+.sp
+\fBWARNING:\fP
+.INDENT 0.0
+.INDENT 3.5
+NSEC3 with the Opt\-Out bit set no longer works as a proof of non\-existence
+in this zone.
+.UNINDENT
+.UNINDENT
+.sp
+\fIDefault:\fP off
+.SS nsec3\-salt\-length
+.sp
+A length of a salt field in octets, which is appended to the original owner
+name before hashing.
+.sp
+\fIDefault:\fP 8
+.SS nsec3\-salt\-lifetime
+.sp
+A validity period of newly issued salt field.
+.sp
+\fIDefault:\fP 30 days
+.SS ksk\-submission
+.sp
+A reference to \fI\%submission\fP section holding parameters of
+KSK submittion checks.
+.sp
+\fIDefault:\fP not set
+.SS cds\-cdnskey\-publish
+.sp
+Controls if and how shall the CDS and CDNSKEY be published in the zone.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+This only applies if the zone keys are automatically managed by the server.
+.UNINDENT
+.UNINDENT
+.sp
+Possible values:
+.INDENT 0.0
+.IP \(bu 2
+\fBnone\fP \- never publish any CDS or CDNSKEY records in the zone
+.IP \(bu 2
+\fBdelete\-dnssec\fP \- publish special CDS and CDNSKEY records indicating turning off DNSSEC
+.IP \(bu 2
+\fBalways\fP \- always publish CDS and CDNSKEY records for the current KSK
+.UNINDENT
+.sp
+\fIDefault:\fP always
+.SH REMOTE SECTION
+.sp
+Definitions of remote servers for outgoing connections (source of a zone
+transfer, target for a notification, etc.).
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+remote:
+  \- id: STR
+    address: ADDR[@INT] ...
+    via: ADDR[@INT] ...
+    key: key_id
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS id
+.sp
+A remote identifier.
+.SS address
+.sp
+An ordered list of destination IP addresses which are used for communication
+with the remote server. The addresses are tried in sequence unless the
+operation is successful. Optional destination port (default is 53)
+can be appended to the address using \fB@\fP separator.
+.sp
+\fIDefault:\fP not set
+.SS via
+.sp
+An ordered list of source IP addresses. The first address with the same family
+as the destination address is used. Optional source port (default is random)
+can be appended to the address using \fB@\fP separator.
+.sp
+\fIDefault:\fP not set
+.SS key
+.sp
+A \fI\%reference\fP to the TSIG key which is used to authenticate
+the communication with the remote server.
+.sp
+\fIDefault:\fP not set
+.SH TEMPLATE SECTION
+.sp
+A template is a shareable zone setting which can be used for configuration of
+many zones in one place. A special default template (with the \fIdefault\fP identifier)
+can be used for global querying configuration or as an implicit configuration
+if a zone doesn\(aqt have another template specified.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+template:
+  \- id: STR
+    timer\-db: STR
+    max\-timer\-db\-size: SIZE
+    journal\-db: STR
+    journal\-db\-mode: robust | asynchronous
+    max\-journal\-db\-size: SIZE
+    kasp\-db: STR
+    max\-kasp\-db\-size: SIZE
+    global\-module: STR/STR ...
+    # All zone options (excluding \(aqtemplate\(aq item)
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS id
+.sp
+A template identifier.
+.SS timer\-db
+.sp
+Specifies a path of the persistent timer database. The path can be specified
+as a relative path to the \fIdefault\fP template \fI\%storage\fP\&.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+This option is only available in the \fIdefault\fP template.
+.UNINDENT
+.UNINDENT
+.sp
+\fIDefault:\fP \fI\%storage\fP/timers
+.SS max\-timer\-db\-size
+.sp
+Hard limit for the timer database maximum size.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+This option is only available in the \fIdefault\fP template.
+.UNINDENT
+.UNINDENT
+.sp
+\fIDefault:\fP 100 MiB
+.SS journal\-db
+.sp
+Specifies a path of the persistent journal database. The path can be specified
+as a relative path to the \fIdefault\fP template \fI\%storage\fP\&.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+This option is only available in the \fIdefault\fP template.
+.UNINDENT
+.UNINDENT
+.sp
+\fIDefault:\fP \fI\%storage\fP/journal
+.SS journal\-db\-mode
+.sp
+Specifies journal LMDB backend configuration, which influences performance
+and durability.
+.sp
+Possible values:
+.INDENT 0.0
+.IP \(bu 2
+\fBrobust\fP – The journal DB disk sychronization ensures DB durability but is
+generally slower
+.IP \(bu 2
+\fBasynchronous\fP – The journal DB disk synchronization is optimized for
+better performance at the expense of lower DB durability; this mode is
+recommended only on slave nodes with many zones
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+This option is only available in the \fIdefault\fP template.
+.UNINDENT
+.UNINDENT
+.sp
+\fIDefault:\fP robust
+.SS max\-journal\-db\-size
+.sp
+Hard limit for the common journal DB. There is no cleanup logic in journal
+to recover from reaching this limit: journal simply starts refusing changes
+across all zones. Decreasing this value has no effect if lower than actual
+DB file size.
+.sp
+It is recommended to limit \fI\%max\-journal\-usage\fP
+per\-zone instead of max\-journal\-size in most cases. Please keep this value
+larger than the sum of all zones\(aq journal usage limits. See more details
+regarding journal behaviour\&.
+.sp
+This value also influences server\(aqs usage of virtual memory.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+This option is only available in the \fIdefault\fP template.
+.UNINDENT
+.UNINDENT
+.sp
+\fIDefault:\fP 20 GiB (1 GiB for 32\-bit)
+.SS kasp\-db
+.sp
+A KASP database path. Non\-absolute path is relative to
+\fI\%storage\fP\&.
+.sp
+\fIDefault:\fP \fI\%storage\fP/keys
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+This option is only available in the \fIdefault\fP template.
+.UNINDENT
+.UNINDENT
+.SS max\-kasp\-db\-size
+.sp
+Hard limit for the KASP database maximum size.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+This option is only available in the \fIdefault\fP template.
+.UNINDENT
+.UNINDENT
+.sp
+\fIDefault:\fP 500 MiB
+.SS global\-module
+.sp
+An ordered list of references to query modules in the form of \fImodule_name\fP or
+\fImodule_name/module_id\fP\&. These modules apply to all queries.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+This option is only available in the \fIdefault\fP template.
+.UNINDENT
+.UNINDENT
+.sp
+\fIDefault:\fP not set
+.SH ZONE SECTION
+.sp
+Definition of zones served by the server.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+zone:
+  \- domain: DNAME
+    template: template_id
+    storage: STR
+    file: STR
+    master: remote_id ...
+    ddns\-master: remote_id
+    notify: remote_id ...
+    acl: acl_id ...
+    semantic\-checks: BOOL
+    disable\-any: BOOL
+    zonefile\-sync: TIME
+    zonefile\-load: none | difference | difference\-no\-serial | whole
+    journal\-content: none | changes | all
+    max\-journal\-usage: SIZE
+    max\-journal\-depth: INT
+    max\-zone\-size : SIZE
+    dnssec\-signing: BOOL
+    dnssec\-policy: STR
+    request\-edns\-option: INT:[HEXSTR]
+    serial\-policy: increment | unixtime | dateserial
+    min\-refresh\-interval: TIME
+    max\-refresh\-interval: TIME
+    module: STR/STR ...
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS domain
+.sp
+A zone name identifier.
+.SS template
+.sp
+A \fI\%reference\fP to a configuration template.
+.sp
+\fIDefault:\fP not set or \fIdefault\fP (if the template exists)
+.SS storage
+.sp
+A data directory for storing zone files, journal database, and timers database.
+.sp
+\fIDefault:\fP \fB${localstatedir}/lib/knot\fP (configured with \fB\-\-with\-storage=path\fP)
+.SS file
+.sp
+A path to the zone file. Non\-absolute path is relative to
+\fI\%storage\fP\&. It is also possible to use the following formatters:
+.INDENT 0.0
+.IP \(bu 2
+\fB%c[\fP\fIN\fP\fB]\fP or \fB%c[\fP\fIN\fP\fB\-\fP\fIM\fP\fB]\fP – means the \fIN\fPth
+character or a sequence of characters beginning from the \fIN\fPth and ending
+with the \fIM\fPth character of the textual zone name (see \fB%s\fP). The
+indexes are counted from 0 from the left. All dots (including the terminal
+one) are considered. If the character is not available, the formatter has no effect.
+.IP \(bu 2
+\fB%l[\fP\fIN\fP\fB]\fP – means the \fIN\fPth label of the textual zone name
+(see \fB%s\fP). The index is counted from 0 from the right (0 ~ TLD).
+If the label is not available, the formatter has no effect.
+.IP \(bu 2
+\fB%s\fP – means the current zone name in the textual representation.
+The zone name doesn\(aqt include the terminating dot (the result for the root
+zone is the empty string!).
+.IP \(bu 2
+\fB%%\fP – means the \fB%\fP character
+.UNINDENT
+.sp
+\fBWARNING:\fP
+.INDENT 0.0
+.INDENT 3.5
+Beware of special characters which are escaped or encoded in the \eDDD form
+where DDD is corresponding decimal ASCII code.
+.UNINDENT
+.UNINDENT
+.sp
+\fIDefault:\fP \fI\%storage\fP/\fB%s\fP\&.zone
+.SS master
+.sp
+An ordered list of \fI\%references\fP to zone master servers.
+.sp
+\fIDefault:\fP not set
+.SS ddns\-master
+.sp
+A \fI\%reference\fP to zone primary master server.
+If not specified, the first \fI\%master\fP server is used.
+.sp
+\fIDefault:\fP not set
+.SS notify
+.sp
+An ordered list of \fI\%references\fP to remotes to which notify
+message is sent if the zone changes.
+.sp
+\fIDefault:\fP not set
+.SS acl
+.sp
+An ordered list of \fI\%references\fP to ACL rules which can allow
+or disallow zone transfers, updates or incoming notifies.
+.sp
+\fIDefault:\fP not set
+.SS semantic\-checks
+.sp
+If enabled, extra zone file semantic checks are turned on.
+.sp
+Several checks are enabled by default and cannot be turned off. An error in
+mandatory checks causes zone not to be loaded. An error in extra checks is
+logged only.
+.sp
+Mandatory checks:
+.INDENT 0.0
+.IP \(bu 2
+SOA record missing in the zone (\fI\%RFC 1034\fP)
+.IP \(bu 2
+An extra record together with CNAME record except for RRSIG and DS (\fI\%RFC 1034\fP)
+.IP \(bu 2
+Multiple CNAME record with the same owner
+.IP \(bu 2
+DNAME record having a record under it (\fI\%RFC 2672\fP)
+.UNINDENT
+.sp
+Extra checks:
+.INDENT 0.0
+.IP \(bu 2
+Missing NS record at the zone apex
+.IP \(bu 2
+Missing glue A or AAAA record
+.IP \(bu 2
+Invalid DNSKEY, DS, or NSEC3PARAM record
+.IP \(bu 2
+CDS or CDNSKEY inconsistency
+.IP \(bu 2
+Missing, invalid, or unverifiable RRSIG record
+.IP \(bu 2
+Invalid NSEC(3) record
+.IP \(bu 2
+Broken or non\-cyclic NSEC(3) chain
+.UNINDENT
+.sp
+\fIDefault:\fP off
+.SS disable\-any
+.sp
+If enabled, all authoritative ANY queries sent over UDP will be answered
+with an empty response and with the TC bit set. Use this option to minimize
+the risk of DNS reflection attack.
+.sp
+\fIDefault:\fP off
+.SS zonefile\-sync
+.sp
+The time after which the current zone in memory will be synced with a zone file
+on the disk (see \fI\%file\fP). The server will serve the latest
+zone even after a restart using zone journal, but the zone file on the disk will
+only be synced after \fBzonefile\-sync\fP time has expired (or after manual zone
+flush). This is applicable when the zone is updated via IXFR, DDNS or automatic
+DNSSEC signing. In order to completely disable automatic zone file synchronization,
+set the value to \-1. In that case, it is still possible to force a manual zone flush
+using the \fB\-f\fP option.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+If you are serving large zones with frequent updates where
+the immediate sync with a zone file is not desirable, increase the value.
+.UNINDENT
+.UNINDENT
+.sp
+\fIDefault:\fP 0 (immediate)
+.SS zonefile\-load
+.sp
+Selects how the zone file contents are applied during zone load.
+.sp
+Possible values:
+.INDENT 0.0
+.IP \(bu 2
+\fBnone\fP – The zone file is not used at all.
+.IP \(bu 2
+\fBdifference\fP – If the zone contents are already available during server start or reload,
+the difference is computed between them and the contents of the zone file. This difference is then checked for semantic errors and
+applied to the current zone contents.
+.IP \(bu 2
+\fBdifference\-no\-serial\fP – Same as \fBdifference\fP, but the SOA serial in the zone file is
+ignored, the server takes care of incrementing the serial automatically.
+.IP \(bu 2
+\fBwhole\fP – Zone contents are loaded from the zone file.
+.UNINDENT
+.sp
+When \fBdifference\fP is configured and there are no zone contents yet (cold start of Knot
+and no zone contents in journal), it behaves the same way like \fBwhole\fP\&.
+.sp
+\fIDefault:\fP whole
+.SS journal\-content
+.sp
+Selects how the journal shall be used to store zone and its changes.
+.sp
+Possible values:
+.INDENT 0.0
+.IP \(bu 2
+\fBnone\fP – The journal is not used at all.
+.IP \(bu 2
+\fBchanges\fP – Zone changes history is stored in journal.
+.IP \(bu 2
+\fBall\fP – Zone contents and history is stored in journal.
+.UNINDENT
+.sp
+\fIDefault:\fP changes
+.SS max\-journal\-usage
+.sp
+Policy how much space in journal DB will the zone\(aqs journal occupy.
+.sp
+\fIDefault:\fP 100 MiB
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Journal DB may grow far above the sum of max\-journal\-usage across
+all zones, because of DB free space fragmentation.
+.UNINDENT
+.UNINDENT
+.SS max\-journal\-depth
+.sp
+Maximum history length of journal.
+.sp
+\fIMinimum:\fP 2
+.sp
+\fIDefault:\fP 2^64
+.SS max\-zone\-size
+.sp
+Maximum size of the zone. The size is measured as size of the zone records
+in wire format without compression. The limit is enforced for incoming zone
+transfers and dynamic updates.
+.sp
+For incremental transfers (IXFR), the effective limit for the total size of
+the records in the transfer is twice the configured value. However the final
+size of the zone must satisfy the configured value.
+.sp
+\fIDefault:\fP 2^64
+.SS dnssec\-signing
+.sp
+If enabled, automatic DNSSEC signing for the zone is turned on.
+.sp
+\fIDefault:\fP off
+.SS dnssec\-policy
+.sp
+A \fI\%reference\fP to DNSSEC signing policy. A special \fIdefault\fP
+value can be used for the default policy settings.
+.sp
+\fIRequired\fP
+.SS request\-edns\-option
+.sp
+An arbitrary EDNS0 option which is included into a server request (AXFR, IXFR,
+SOA, or NOTIFY). The value is in the option_code:option_data format.
+.sp
+\fIDefault:\fP not set
+.SS serial\-policy
+.sp
+Specifies how the zone serial is updated after a dynamic update or
+automatic DNSSEC signing. If the serial is changed by the dynamic update,
+no change is made.
+.sp
+Possible values:
+.INDENT 0.0
+.IP \(bu 2
+\fBincrement\fP – The serial is incremented according to serial number arithmetic
+.IP \(bu 2
+\fBunixtime\fP – The serial is set to the current unix time
+.IP \(bu 2
+.INDENT 2.0
+.TP
+\fBdateserial\fP – The 10\-digit serial (YYYYMMDDnn) is incremented, the first
+8 digits match the current iso\-date
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+In case of \fBunixtime\fP, if the resulting serial is lower or equal than current zone
+(this happens e.g. in case of migrating from other policy or frequent updates)
+the serial is incremented instead.
+.sp
+Use dateserial only if you expect less than 100 updates per day per zone.
+.UNINDENT
+.UNINDENT
+.sp
+\fIDefault:\fP increment
+.SS min\-refresh\-interval
+.sp
+Forced minimum zone refresh interval to avoid flooding master.
+.sp
+\fIDefault:\fP 2
+.SS max\-refresh\-interval
+.sp
+Forced maximum zone refresh interval.
+.sp
+\fIDefault:\fP not set
+.SS module
+.sp
+An ordered list of references to query modules in the form of \fImodule_name\fP or
+\fImodule_name/module_id\fP\&. These modules apply only to the current zone queries.
+.sp
+\fIDefault:\fP not set
+.SH LOGGING SECTION
+.sp
+Server can be configured to log to the standard output, standard error
+output, syslog (or systemd journal if systemd is enabled) or into an arbitrary
+file.
+.sp
+There are 6 logging severity levels:
+.INDENT 0.0
+.IP \(bu 2
+\fBcritical\fP – Non\-recoverable error resulting in server shutdown
+.IP \(bu 2
+\fBerror\fP – Recoverable error, action should be taken
+.IP \(bu 2
+\fBwarning\fP – Warning that might require user action
+.IP \(bu 2
+\fBnotice\fP – Server notice or hint
+.IP \(bu 2
+\fBinfo\fP – Informational message
+.IP \(bu 2
+\fBdebug\fP – Debug messages (must be turned on at compile time)
+.UNINDENT
+.sp
+In the case of missing log section, \fBwarning\fP or more serious messages
+will be logged to both standard error output and syslog. The \fBinfo\fP and
+\fBnotice\fP messages will be logged to standard output.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+log:
+  \- target: stdout | stderr | syslog | STR
+    server: critical | error | warning | notice | info | debug
+    control: critical | error | warning | notice | info | debug
+    zone: critical | error | warning | notice | info | debug
+    any: critical | error | warning | notice | info | debug
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS target
+.sp
+A logging output.
+.sp
+Possible values:
+.INDENT 0.0
+.IP \(bu 2
+\fBstdout\fP – Standard output
+.IP \(bu 2
+\fBstderr\fP – Standard error output
+.IP \(bu 2
+\fBsyslog\fP – Syslog
+.IP \(bu 2
+\fIfile_name\fP – File
+.UNINDENT
+.SS server
+.sp
+Minimum severity level for messages related to general operation of the server
+that are logged.
+.sp
+\fIDefault:\fP not set
+.SS control
+.sp
+Minimum severity level for messages related to server control that are logged.
+.sp
+\fIDefault:\fP not set
+.SS zone
+.sp
+Minimum severity level for messages related to zones that are logged.
+.sp
+\fIDefault:\fP not set
+.SS any
+.sp
+Minimum severity level for all message types that are logged.
+.sp
+\fIDefault:\fP not set
+.SH AUTHOR
+CZ.NIC Labs <http://www.knot-dns.cz>
+.SH COPYRIGHT
+Copyright 2010–2018, CZ.NIC, z.s.p.o.
+.\" Generated by docutils manpage writer.
+.

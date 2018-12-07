@@ -1,0 +1,729 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Operation &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Troubleshooting" href="troubleshooting.html" />
+    <link rel="prev" title="Configuration" href="configuration.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="troubleshooting.html" title="Troubleshooting"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="configuration.html" title="Configuration"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="operation">
+<span id="id1"></span><h1>Operation<a class="headerlink" href="#operation" title="Permalink to this headline">¶</a></h1>
+<p>The Knot DNS server part <code class="docutils literal notranslate"><span class="pre">knotd</span></code> can run either in the foreground, or in the background
+using the <code class="docutils literal notranslate"><span class="pre">-d</span></code> option. When run in the foreground, it doesn’t create a PID file.
+Other than that, there are no differences and you can control both the same way.</p>
+<p>The tool <code class="docutils literal notranslate"><span class="pre">knotc</span></code> is designed as a user front-end, making it easier to control running
+server daemon. If you want to control the daemon directly, use <code class="docutils literal notranslate"><span class="pre">SIGINT</span></code> to quit
+the process or <code class="docutils literal notranslate"><span class="pre">SIGHUP</span></code> to reload the configuration.</p>
+<p>If you pass neither configuration file (<code class="docutils literal notranslate"><span class="pre">-c</span></code> parameter) nor configuration
+database (<code class="docutils literal notranslate"><span class="pre">-C</span></code> parameter), the server will first attempt to use the default
+configuration database stored in <code class="docutils literal notranslate"><span class="pre">/var/lib/knot/confdb</span></code> or the
+default configuration file stored in <code class="docutils literal notranslate"><span class="pre">/etc/knot/knot.conf</span></code>. Both the
+default paths can be reconfigured with <code class="docutils literal notranslate"><span class="pre">--with-storage=path</span></code> or
+<code class="docutils literal notranslate"><span class="pre">--with-configdir=path</span></code> respectively.</p>
+<p>Example of server start as a daemon:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotd -d -c knot.conf
+</pre></div>
+</div>
+<p>Example of server shutdown:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc -c knot.conf stop
+</pre></div>
+</div>
+<p>For a complete list of actions refer to the program help (<code class="docutils literal notranslate"><span class="pre">-h</span></code> parameter)
+or to the corresponding manual page.</p>
+<p>Also, the server needs to create <a class="reference internal" href="reference.html#server-rundir"><span class="std std-ref">rundir</span></a> and <a class="reference internal" href="reference.html#zone-storage"><span class="std std-ref">storage</span></a>
+directories in order to run properly.</p>
+<div class="section" id="configuration-database">
+<span id="id2"></span><h2>Configuration database<a class="headerlink" href="#configuration-database" title="Permalink to this headline">¶</a></h2>
+<p>In the case of a huge configuration file, the configuration can be stored
+in a binary database. Such a database can be simply initialized:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-init
+</pre></div>
+</div>
+<p>or preloaded from a file:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-import input.conf
+</pre></div>
+</div>
+<p>Also the configuration database can be exported into a textual file:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-export output.conf
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The import and export commands access the configuration database
+directly, without any interaction with the server. So it is strictly
+recommended to perform these operations when the server is not running.</p>
+</div>
+</div>
+<div class="section" id="dynamic-configuration">
+<span id="id3"></span><h2>Dynamic configuration<a class="headerlink" href="#dynamic-configuration" title="Permalink to this headline">¶</a></h2>
+<p>The configuration database can be accessed using the server control interface
+while the server is running. To get the full power of the dynamic configuration,
+the server must be started with a specified configuration database location
+or with the default database initialized. Otherwise all the changes to the
+configuration will be temporary (until the server is stopped).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The database can be <a class="reference internal" href="#configuration-database"><span class="std std-ref">imported</span></a> in advance.</p>
+</div>
+<p>Most of the commands get an item name and value parameters. The item name is
+in the form of <code class="docutils literal notranslate"><span class="pre">section[identifier].name</span></code>. If the item is multivalued,
+more values can be specified as individual (command line) arguments. Beware of
+the possibility of pathname expansion by the shell. For this reason, slashed
+square brackets or quoted parameters is advisable.</p>
+<p>To get the list of configuration sections or to get the list of section items:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-list
+<span class="gp">$</span> knotc conf-list <span class="s1">&#39;server&#39;</span>
+</pre></div>
+</div>
+<p>To get the whole configuration or to get the whole configuration section or
+to get all section identifiers or to get a specific configuration item:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-read
+<span class="gp">$</span> knotc conf-read <span class="s1">&#39;remote&#39;</span>
+<span class="gp">$</span> knotc conf-read <span class="s1">&#39;zone.domain&#39;</span>
+<span class="gp">$</span> knotc conf-read <span class="s1">&#39;zone[example.com].master&#39;</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The following operations don’t work on OpenBSD!</p>
+</div>
+<p>Modifying operations require an active configuration database transaction.
+Just one transaction can be active at a time. Such a transaction then can
+be aborted or committed. A semantic check is executed automatically before
+every commit:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-begin
+<span class="gp">$</span> knotc conf-abort
+<span class="gp">$</span> knotc conf-commit
+</pre></div>
+</div>
+<p>To set a configuration item value or to add more values or to add a new
+section identifier or to add a value to all identified sections:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-set <span class="s1">&#39;server.identity&#39;</span> <span class="s1">&#39;Knot DNS&#39;</span>
+<span class="gp">$</span> knotc conf-set <span class="s1">&#39;server.listen&#39;</span> <span class="s1">&#39;0.0.0.0@53&#39;</span> <span class="s1">&#39;::@53&#39;</span>
+<span class="gp">$</span> knotc conf-set <span class="s1">&#39;zone[example.com]&#39;</span>
+<span class="gp">$</span> knotc conf-set <span class="s1">&#39;zone.slave&#39;</span> <span class="s1">&#39;slave2&#39;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Also the include operation can be performed. A non-absolute file
+location is relative to the server binary path, not to the control binary
+path!</p>
+<div class="last highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-set <span class="s1">&#39;include&#39;</span> <span class="s1">&#39;/tmp/new_zones.conf&#39;</span>
+</pre></div>
+</div>
+</div>
+<p>To unset the whole configuration or to unset the whole configuration section
+or to unset an identified section or to unset an item or to unset a specific
+item value:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-unset
+<span class="gp">$</span> knotc conf-unset <span class="s1">&#39;zone&#39;</span>
+<span class="gp">$</span> knotc conf-unset <span class="s1">&#39;zone[example.com]&#39;</span>
+<span class="gp">$</span> knotc conf-unset <span class="s1">&#39;zone[example.com].master&#39;</span>
+<span class="gp">$</span> knotc conf-unset <span class="s1">&#39;zone[example.com].master&#39;</span> <span class="s1">&#39;remote2&#39;</span> <span class="s1">&#39;remote5&#39;</span>
+</pre></div>
+</div>
+<p>To get the change between the current configuration and the active transaction
+for the whole configuration or for a specific section or for a specific
+identified section or for a specific item:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-diff
+<span class="gp">$</span> knotc conf-diff <span class="s1">&#39;zone&#39;</span>
+<span class="gp">$</span> knotc conf-diff <span class="s1">&#39;zone[example.com]&#39;</span>
+<span class="gp">$</span> knotc conf-diff <span class="s1">&#39;zone[example.com].master&#39;</span>
+</pre></div>
+</div>
+<p>An example of possible configuration initialization:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-begin
+<span class="gp">$</span> knotc conf-set <span class="s1">&#39;server.listen&#39;</span> <span class="s1">&#39;0.0.0.0@53&#39;</span> <span class="s1">&#39;::@53&#39;</span>
+<span class="gp">$</span> knotc conf-set <span class="s1">&#39;remote[master_server]&#39;</span>
+<span class="gp">$</span> knotc conf-set <span class="s1">&#39;remote[master_server].address&#39;</span> <span class="s1">&#39;192.168.1.1&#39;</span>
+<span class="gp">$</span> knotc conf-set <span class="s1">&#39;template[default]&#39;</span>
+<span class="gp">$</span> knotc conf-set <span class="s1">&#39;template[default].storage&#39;</span> <span class="s1">&#39;/var/lib/knot/zones/&#39;</span>
+<span class="gp">$</span> knotc conf-set <span class="s1">&#39;template[default].master&#39;</span> <span class="s1">&#39;master_server&#39;</span>
+<span class="gp">$</span> knotc conf-set <span class="s1">&#39;zone[example.com]&#39;</span>
+<span class="gp">$</span> knotc conf-diff
+<span class="gp">$</span> knotc conf-commit
+</pre></div>
+</div>
+</div>
+<div class="section" id="slave-mode">
+<span id="running-a-slave-server"></span><h2>Slave mode<a class="headerlink" href="#slave-mode" title="Permalink to this headline">¶</a></h2>
+<p>Running the server as a slave is very straightforward as you usually
+bootstrap zones over AXFR and thus avoid any manual zone operations.
+In contrast to AXFR, when the incremental transfer finishes, it stores
+the differences in the journal file and doesn’t update the zone file
+immediately but after the <a class="reference internal" href="reference.html#zone-zonefile-sync"><span class="std std-ref">zonefile-sync</span></a> period elapses.</p>
+</div>
+<div class="section" id="master-mode">
+<span id="running-a-master-server"></span><h2>Master mode<a class="headerlink" href="#master-mode" title="Permalink to this headline">¶</a></h2>
+<p>If you just want to check the zone files before starting, you can use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-check example.com
+</pre></div>
+</div>
+<p>For an approximate estimation of server’s memory consumption, you can use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-memstats example.com
+</pre></div>
+</div>
+<p>This action prints the count of resource records, percentage of signed
+records and finally estimation of memory consumption for each zone, unless
+specified otherwise. Please note that the estimated values may differ from the
+actual consumption. Also, for slave servers with incoming transfers
+enabled, be aware that the actual memory consumption might be double
+or higher during transfers.</p>
+</div>
+<div class="section" id="reading-and-editing-zones">
+<span id="editing-zones"></span><h2>Reading and editing zones<a class="headerlink" href="#reading-and-editing-zones" title="Permalink to this headline">¶</a></h2>
+<p>Knot DNS allows you to read or change zone contents online using server
+control interface.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Avoid concurrent zone file modification, and/or dynamic updates, and/or
+zone changing over control interface. Otherwise, the zone could be inconsistent.</p>
+</div>
+<p>To get contents of all configured zones, or a specific zone contents, or zone
+records with a specific owner, or even with a specific record type:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-read --
+<span class="gp">$</span> knotc zone-read example.com
+<span class="gp">$</span> knotc zone-read example.com ns1
+<span class="gp">$</span> knotc zone-read example.com ns1 NS
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the record owner is not a fully qualified domain name, then it is
+considered as a relative name to the zone name.</p>
+</div>
+<p>To start a writing transaction on all zones or on specific zones:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-begin --
+<span class="gp">$</span> knotc zone-begin example.com example.net
+</pre></div>
+</div>
+<p>Now you can list all nodes within the transaction using the <code class="docutils literal notranslate"><span class="pre">`zone-get`</span></code>
+command, which always returns current data with all changes included. The
+command has the same syntax as <code class="docutils literal notranslate"><span class="pre">`zone-read`</span></code>.</p>
+<p>Within the transaction, you can add a record to a specific zone or to all
+zones with an open transaction:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-set example.com ns1 <span class="m">3600</span> A <span class="m">192</span>.168.0.1
+<span class="gp">$</span> knotc zone-set -- ns1 <span class="m">3600</span> A <span class="m">192</span>.168.0.1
+</pre></div>
+</div>
+<p>To remove all records with a specific owner, or a specific rrset, or a
+specific record data:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-unset example.com ns1
+<span class="gp">$</span> knotc zone-unset example.com ns1 A
+<span class="gp">$</span> knotc zone-unset example.com ns1 A <span class="m">192</span>.168.0.2
+</pre></div>
+</div>
+<p>To see the difference between the original zone and the current version:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-diff example.com
+</pre></div>
+</div>
+<p>Finally, either commit or abort your transaction:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-commit example.com
+<span class="gp">$</span> knotc zone-abort example.com
+</pre></div>
+</div>
+<p>A full example of setting up a completely new zone from scratch:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-begin
+<span class="gp">$</span> knotc conf-set zone.domain example.com
+<span class="gp">$</span> knotc conf-commit
+<span class="gp">$</span> knotc zone-begin example.com
+<span class="gp">$</span> knotc zone-set example.com @ <span class="m">7200</span> SOA ns hostmaster <span class="m">1</span> <span class="m">86400</span> <span class="m">900</span> <span class="m">691200</span> <span class="m">3600</span>
+<span class="gp">$</span> knotc zone-set example.com ns <span class="m">3600</span> A <span class="m">192</span>.168.0.1
+<span class="gp">$</span> knotc zone-set example.com www <span class="m">3600</span> A <span class="m">192</span>.168.0.100
+<span class="gp">$</span> knotc zone-commit example.com
+</pre></div>
+</div>
+</div>
+<div class="section" id="reading-and-editing-the-zone-file-safely">
+<span id="editing-zone-file"></span><h2>Reading and editing the zone file safely<a class="headerlink" href="#reading-and-editing-the-zone-file-safely" title="Permalink to this headline">¶</a></h2>
+<p>It’s always possible to read and edit the zone contents via zone file manipulation.
+However, it may lead to confusion if zone contents are continuously changing or
+in case of operator’s mistake. This paragraph describes a safe way to modify zone
+by editing the zone file, taking advantage of zone freeze/thaw feature.:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-freeze example.com.
+<span class="gp">$</span> <span class="k">while</span> ! knotc zone-status example.com. +freeze <span class="p">|</span> grep -q <span class="s1">&#39;freeze: yes&#39;</span><span class="p">;</span> <span class="k">do</span> sleep <span class="m">1</span><span class="p">;</span> <span class="k">done</span>
+<span class="gp">$</span> knotc zone-flush example.com.
+</pre></div>
+</div>
+<p>After calling freeze to the zone, there still may be running zone operations (e.g. signing),
+causing freeze pending. So we watch the zone status until frozen. Then we can flush the
+frozen zone contents.</p>
+<p>Now we open a text editor and perform desired changes to the zone file. It’s necessary
+to <strong>increase SOA serial</strong> in this step to keep consistency. Finally, we can load the
+modified zone file and if successful, thaw the zone.:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-reload example.com.
+<span class="gp">$</span> knotc zone-thaw example.com.
+</pre></div>
+</div>
+</div>
+<div class="section" id="zone-loading">
+<span id="id4"></span><h2>Zone loading<a class="headerlink" href="#zone-loading" title="Permalink to this headline">¶</a></h2>
+<p>The process how the server loads a zone is influenced by the configuration of the
+<a class="reference internal" href="reference.html#zone-zonefile-load"><span class="std std-ref">zonefile-load</span></a> and <a class="reference internal" href="reference.html#zone-journal-content"><span class="std std-ref">journal-content</span></a>
+parameters (also DNSSEC signing applies), the existence of a zone file and journal
+(and their relative out-of-dateness), and whether it is a cold start of the server
+or a zone reload (e.g. invoked by the knotc interface). Please note that zone transfers
+are not taken into account here – they are planned after the zone is loaded
+(including AXFR bootstrap).</p>
+<p>If the zone file exists and is not excluded by the configuration, it is first loaded
+and according to its SOA serial number relevant journal changesets are applied.
+If this is a zone reload and we have “<cite>zonefile-load: difference</cite>”, the difference
+between old and new contents is computed and stored into the journal like an update.
+The zone file should be either unchaged since last load or changed with incremented
+SOA serial. In the case of a decreased SOA serial, the load is interrupted with
+an error; if unchanged, it is increased by the server.</p>
+<p>If the procedure described above succeeds without errors, the resulting zone contents are (after potential DNSSEC signing)
+used as the new zone.</p>
+<p>The option “<cite>journal-content: all</cite>” lets the server, beside better performance, to keep
+track of the zone contents also across server restarts. It makes the cold start
+effectively work like a zone reload with the old contents loaded from the journal
+(unless this is the very first start with the zone not yet saved into the journal).</p>
+</div>
+<div class="section" id="journal-behaviour">
+<span id="id5"></span><h2>Journal behaviour<a class="headerlink" href="#journal-behaviour" title="Permalink to this headline">¶</a></h2>
+<p>The zone journal keeps some history of changes made to the zone. It is useful for
+responding to IXFR queries. Also if <a class="reference internal" href="reference.html#zone-zonefile-sync"><span class="std std-ref">zone file flush</span></a> is disabled,
+journal keeps diff between the zone file and zone for the case of server shutdown.
+The history is stored in changesets – diffs of zone contents between two
+(usually subsequent) zone serials.</p>
+<p>Journals of all zones are stored in a common LMDB database. Huge changesets are
+split into 70 KiB <a class="footnote-reference" href="#fn-hc" id="id6">[1]</a> blocks to prevent fragmentation of the DB.
+Journal does each operation in one transaction to keep consistency of the DB and performance.
+The exception is when store transaction exceeds 5 % of the whole DB mapsize, it is split into multiple ones
+and some dirty-chunks-management involves.</p>
+<p>Each zone journal has own <a class="reference internal" href="reference.html#zone-max-journal-usage"><span class="std std-ref">usage limit</span></a>
+on how much DB space it may occupy. Before hitting the limit,
+changesets are stored one-by-one and whole history is linear. While hitting the limit,
+the zone is flushed into the zone file, and oldest changesets are deleted as needed to free
+some space. Actually, twice <a class="footnote-reference" href="#fn-hc" id="id7">[1]</a> the needed amount is deleted to
+prevent too frequent deletes. Further zone file flush is invoked after the journal runs out of deletable
+“flushed changesets”.</p>
+<p>If <a class="reference internal" href="reference.html#zone-zonefile-sync"><span class="std std-ref">zone file flush</span></a> is disabled, then instead of flushing the zone, the journal tries to
+save space by merging older changesets into one. It works well if the changes rewrite
+each other, e.g. periodically changing few zone records, re-signing whole zone…
+The difference between the zone file and the zone is thus preserved, even if journal deletes some
+older changesets.</p>
+<p>If the journal is used to store both zone history and contents, a special changeset
+is present with zone contents. When the journal gets full, the changes are merged into this
+special changeset.</p>
+<p>There is also a <a class="reference internal" href="reference.html#template-max-journal-db-size"><span class="std std-ref">safety hard limit</span></a> for overall
+journal database size, but it’s strongly recommended to set the per-zone limits in
+a way to prevent hitting this one. For LMDB, it’s hard to recover from the
+database-full state. For wiping one zone’s journal, see <em>knotc zone-purge +journal</em>
+command.</p>
+<table class="docutils footnote" frame="void" id="fn-hc" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td><em>(<a class="fn-backref" href="#id6">1</a>, <a class="fn-backref" href="#id7">2</a>)</em> This constant is hardcoded.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="handling-zone-file-journal-changes-serials">
+<span id="id8"></span><h2>Handling zone file, journal, changes, serials<a class="headerlink" href="#handling-zone-file-journal-changes-serials" title="Permalink to this headline">¶</a></h2>
+<p>Some configuration options regarding the zone file and journal, together with operation
+procedures, might lead to unexpected results. This chapter shall point out
+some interference and both recommend and warn before some combinations thereof.
+Unfortunately, there is no optimal combination of configuration options,
+every approach has some disadvantages.</p>
+<div class="section" id="example-1">
+<h3>Example 1<a class="headerlink" href="#example-1" title="Permalink to this headline">¶</a></h3>
+<p>Keep the zone file updated:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">zonefile-sync: 0</span>
+<span class="go">zonefile-load: whole</span>
+<span class="go">journal-contents: changes</span>
+</pre></div>
+</div>
+<p>This is actually setting default values. The user can always check the current zone
+contents in the zonei file, and also modify it (recommended with server turned-off or
+taking the <a class="reference internal" href="#editing-zone-file"><span class="std std-ref">safe way</span></a>). Journal serves here just as a source of
+history for slaves’ IXFR. Some users dislike that the server overwrites their prettily
+prepared zone file.</p>
+</div>
+<div class="section" id="example-2">
+<h3>Example 2<a class="headerlink" href="#example-2" title="Permalink to this headline">¶</a></h3>
+<p>Zonefileless setup:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">zonefile-sync: -1</span>
+<span class="go">zonefile-load: none</span>
+<span class="go">journal-contents: all</span>
+</pre></div>
+</div>
+<p>Zone contents are stored just in the journal. The zone is updated by DDNS,
+zone transfer, or via the control interface. The user might have filled the
+zone contents initially from a zone file by setting “zonefile-load: whole” temporarily.
+It’s also a good setup for slaves. Anyway, it’s recommended to carefully tune
+the journal-size-related options to avoid surprises of journal getting full.</p>
+</div>
+<div class="section" id="example-3">
+<h3>Example 3<a class="headerlink" href="#example-3" title="Permalink to this headline">¶</a></h3>
+<p>Input-only zone file:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">zonefile-sync: -1</span>
+<span class="go">zonefile-load: difference</span>
+<span class="go">journal-contents: changes</span>
+</pre></div>
+</div>
+<p>The user can make changes to the zone by editing the zone file, and his pretty zone file
+gets never overwritten and filled with DNSSEC-related autogenerated records – they are
+only stored in the journal.</p>
+<p>The zone file’s SOA serial must be properly set to a number which is higher than the
+current SOA serial in the zone (not in the zone file) if manually updated!</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In the case of “zonefile-load: difference-no-serial”, the SOA serial is
+handled by the server automatically during server reload.</p>
+</div>
+</div>
+</div>
+<div class="section" id="dnssec-key-rollovers">
+<span id="id9"></span><h2>DNSSEC key rollovers<a class="headerlink" href="#dnssec-key-rollovers" title="Permalink to this headline">¶</a></h2>
+<p>This section describes the process of DNSSEC key rollover and its implementation
+in Knot DNS, and how the operator might watch and check that it’s working correctly.
+The prerequisite is automatic zone signing with enabled
+<a class="reference internal" href="configuration.html#dnssec-automatic-ksk-management"><span class="std std-ref">automatic key management</span></a>.</p>
+<p>The KSK and ZSK rollovers are triggered by the respective zone key getting old according
+to the settings (see <a class="reference internal" href="reference.html#policy-ksk-lifetime"><span class="std std-ref">KSK</span></a> and <a class="reference internal" href="reference.html#policy-zsk-lifetime"><span class="std std-ref">ZSK</span></a> lifetimes).</p>
+<p>The algorithm rollover happens when the policy <a class="reference internal" href="reference.html#policy-algorithm"><span class="std std-ref">algorithm</span></a>
+field is updated to a different value.</p>
+<p>The signing scheme rollover happens when the policy <a class="reference internal" href="reference.html#policy-single-type-signing"><span class="std std-ref">singing scheme</span></a>
+field is changed.</p>
+<p>It’s also possible to change the algorithm and signing scheme in one rollover.</p>
+<p>The operator may check the next rollover phase time by watching the next zone signing time,
+either in the log or via <code class="docutils literal notranslate"><span class="pre">knotc</span> <span class="pre">zone-status</span></code>. There is no special log for finishing a rollover.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There are never two key rollovers running in parallel for one zone. If
+a rollover is triggered while another is in progress, it waits until the
+first one is finished.</p>
+</div>
+<p>The ZSK rollover is performed with Pre-publish method, KSK rollover uses Double-Signature
+scheme, as described in <span class="target" id="index-0"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6781.html"><strong>RFC 6781</strong></a>.</p>
+<div class="section" id="ksk-rollover-example">
+<span id="dnssec-ksk-rollover-example"></span><h3>KSK rollover example<a class="headerlink" href="#ksk-rollover-example" title="Permalink to this headline">¶</a></h3>
+<p>Let’s start with the following set of keys:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">2017-10-24T15:40:48 info: [example.com.] DNSSEC, key, tag  4700, algorithm RSASHA256, KSK, public, active</span>
+<span class="go">2017-10-24T15:40:48 info: [example.com.] DNSSEC, key, tag 30936, algorithm RSASHA256, public, active</span>
+</pre></div>
+</div>
+<p>The last fields hint the key state: <code class="docutils literal notranslate"><span class="pre">public</span></code> denotes a key that will be presented
+as the DNSKEY record, <code class="docutils literal notranslate"><span class="pre">ready</span></code> means that CDS/CDNSKEY records were created,
+<code class="docutils literal notranslate"><span class="pre">active</span></code> tells us if the key is used for signing.</p>
+<p>Upon the zone’s KSK lifetime expiration, the rollover continues along the
+lines of <span class="target" id="index-1"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6781.html#section-4.1.2"><strong>RFC 6781#section-4.1.2</strong></a>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">2017-10-24T15:41:17 info: [example.com.] DNSSEC, signing zone</span>
+<span class="go">2017-10-24T15:41:18 info: [example.com.] DNSSEC, KSK rollover started</span>
+<span class="go">2017-10-24T15:41:18 info: [example.com.] DNSSEC, key, tag  6674, algorithm RSASHA256, KSK, public</span>
+<span class="go">2017-10-24T15:41:18 info: [example.com.] DNSSEC, key, tag  4700, algorithm RSASHA256, KSK, public, active</span>
+<span class="go">2017-10-24T15:41:18 info: [example.com.] DNSSEC, key, tag 30936, algorithm RSASHA256, public, active</span>
+<span class="go">2017-10-24T15:41:18 info: [example.com.] DNSSEC, signing started</span>
+<span class="go">2017-10-24T15:41:18 info: [example.com.] DNSSEC, successfully signed</span>
+<span class="go">2017-10-24T15:41:18 info: [example.com.] DNSSEC, next signing at 2017-10-24T15:41:22</span>
+<span class="go">...</span>
+<span class="go">2017-10-24T15:41:22 info: [example.com.] DNSSEC, signing zone</span>
+<span class="go">2017-10-24T15:41:22 info: [example.com.] DNSSEC, key, tag  4700, algorithm RSASHA256, KSK, public, active</span>
+<span class="go">2017-10-24T15:41:22 info: [example.com.] DNSSEC, key, tag  6674, algorithm RSASHA256, KSK, public, ready, active</span>
+<span class="go">2017-10-24T15:41:22 info: [example.com.] DNSSEC, key, tag 30936, algorithm RSASHA256, public, active</span>
+<span class="go">2017-10-24T15:41:22 info: [example.com.] DNSSEC, signing started</span>
+<span class="go">2017-10-24T15:41:22 info: [example.com.] DNSSEC, successfully signed</span>
+<span class="go">2017-10-24T15:41:22 info: [example.com.] DNSSEC, next signing at 2017-10-24T15:41:23</span>
+<span class="go">2017-10-24T15:41:22 notice: [example.com.] DNSSEC, KSK submission, waiting for confirmation</span>
+</pre></div>
+</div>
+<p>At this point new KSK has to be submitted to the parent zone. Knot detects the updated parent’s DS
+record automatically if <a class="reference internal" href="reference.html#submission-section"><span class="std std-ref">parent DS check</span></a> is configured, otherwise the
+operator must confirm it manually with <code class="docutils literal notranslate"><span class="pre">knotc</span> <span class="pre">zone-ksk-submitted</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">2017-10-24T15:41:23 notice: [example.com.] DNSSEC, KSK submission, confirmed</span>
+<span class="go">2017-10-24T15:41:23 info: [example.com.] DNSSEC, signing zone</span>
+<span class="go">2017-10-24T15:41:23 info: [example.com.] DNSSEC, key, tag  6674, algorithm RSASHA256, KSK, public, active</span>
+<span class="go">2017-10-24T15:41:23 info: [example.com.] DNSSEC, key, tag  4700, algorithm RSASHA256, KSK, public, active</span>
+<span class="go">2017-10-24T15:41:23 info: [example.com.] DNSSEC, key, tag 30936, algorithm RSASHA256, public, active</span>
+<span class="go">2017-10-24T15:41:23 info: [example.com.] DNSSEC, signing started</span>
+<span class="go">2017-10-24T15:41:23 info: [example.com.] DNSSEC, zone is up-to-date</span>
+<span class="go">2017-10-24T15:41:23 info: [example.com.] DNSSEC, next signing at 2017-10-24T15:41:28</span>
+<span class="go">...</span>
+<span class="go">2017-10-24T15:41:28 info: [example.com.] DNSSEC, signing zone</span>
+<span class="go">2017-10-24T15:41:28 info: [example.com.] DNSSEC, key, tag  4700, algorithm RSASHA256, KSK, public</span>
+<span class="go">2017-10-24T15:41:28 info: [example.com.] DNSSEC, key, tag  6674, algorithm RSASHA256, KSK, public, active</span>
+<span class="go">2017-10-24T15:41:28 info: [example.com.] DNSSEC, key, tag 30936, algorithm RSASHA256, public, active</span>
+<span class="go">2017-10-24T15:41:28 info: [example.com.] DNSSEC, signing started</span>
+<span class="go">2017-10-24T15:41:28 info: [example.com.] DNSSEC, successfully signed</span>
+<span class="go">2017-10-24T15:41:28 info: [example.com.] DNSSEC, next signing at 2017-10-24T15:41:33</span>
+<span class="go">...</span>
+<span class="go">2017-10-24T15:41:33 info: [example.com.] DNSSEC, signing zone</span>
+<span class="go">2017-10-24T15:41:33 info: [example.com.] DNSSEC, key, tag  6674, algorithm RSASHA256, KSK, public, active</span>
+<span class="go">2017-10-24T15:41:33 info: [example.com.] DNSSEC, key, tag 30936, algorithm RSASHA256, public, active</span>
+<span class="go">2017-10-24T15:41:33 info: [example.com.] DNSSEC, signing started</span>
+<span class="go">2017-10-24T15:41:33 info: [example.com.] DNSSEC, successfully signed</span>
+<span class="go">2017-10-24T15:41:33 info: [example.com.] DNSSEC, next signing at 2017-10-24T15:41:47</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p>If systemd is available, the KSK submission event is logged into journald
+in a structured way. The intended use case is to trigger a user-created script.
+Example:</p>
+<div class="last highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">journalctl -f -t knotd -o json | python3 -c &#39;</span>
+<span class="go">import json, sys</span>
+<span class="go">for line in sys.stdin:</span>
+<span class="go">  k = json.loads(line);</span>
+<span class="go">  if &quot;KEY_SUBMISSION&quot; in k:</span>
+<span class="go">    print(&quot;%s, zone=%s, keytag=%s&quot; % (k[&quot;__REALTIME_TIMESTAMP&quot;], k[&quot;ZONE&quot;], k[&quot;KEY_SUBMISSION&quot;]))</span>
+<span class="go">&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="algorithm-rollover-example">
+<h3>Algorithm rollover example<a class="headerlink" href="#algorithm-rollover-example" title="Permalink to this headline">¶</a></h3>
+<p>Let’s start with the following set of keys:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">2017-10-24T14:53:06 info: [example.com.] DNSSEC, key, tag 65225, algorithm RSASHA256, KSK, public, active</span>
+<span class="go">2017-10-24T14:53:06 info: [example.com.] DNSSEC, key, tag 47014, algorithm RSASHA256, public, active</span>
+</pre></div>
+</div>
+<p>When the zone’s DNSSEC policy algorithm is changed to <code class="docutils literal notranslate"><span class="pre">ECDSAP256SHA256</span></code> and the
+server is reloaded, the rollover continues along the lines of <span class="target" id="index-2"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6781.html#section-4.1.4"><strong>RFC 6781#section-4.1.4</strong></a>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">2017-10-24T14:53:26 info: [example.com.] DNSSEC, algorithm rollover started</span>
+<span class="go">2017-10-24T14:53:26 info: [example.com.] DNSSEC, key, tag 34608, algorithm ECDSAP256SHA256, KSK</span>
+<span class="go">2017-10-24T14:53:26 info: [example.com.] DNSSEC, key, tag 13674, algorithm ECDSAP256SHA256, active</span>
+<span class="go">2017-10-24T14:53:26 info: [example.com.] DNSSEC, key, tag 65225, algorithm RSASHA256, KSK, public, active</span>
+<span class="go">2017-10-24T14:53:26 info: [example.com.] DNSSEC, key, tag 47014, algorithm RSASHA256, public, active</span>
+<span class="go">2017-10-24T14:53:26 info: [example.com.] DNSSEC, signing started</span>
+<span class="go">2017-10-24T14:53:26 info: [example.com.] DNSSEC, successfully signed</span>
+<span class="go">2017-10-24T14:53:26 info: [example.com.] DNSSEC, next signing at 2017-10-24T14:53:34</span>
+<span class="go">...</span>
+<span class="go">2017-10-24T14:53:34 info: [example.com.] DNSSEC, signing zone</span>
+<span class="go">2017-10-24T14:53:34 info: [example.com.] DNSSEC, key, tag 34608, algorithm ECDSAP256SHA256, KSK, public, active</span>
+<span class="go">2017-10-24T14:53:34 info: [example.com.] DNSSEC, key, tag 13674, algorithm ECDSAP256SHA256, public, active</span>
+<span class="go">2017-10-24T14:53:34 info: [example.com.] DNSSEC, key, tag 65225, algorithm RSASHA256, KSK, public, active</span>
+<span class="go">2017-10-24T14:53:34 info: [example.com.] DNSSEC, key, tag 47014, algorithm RSASHA256, public, active</span>
+<span class="go">2017-10-24T14:53:34 info: [example.com.] DNSSEC, signing started</span>
+<span class="go">2017-10-24T14:53:34 info: [example.com.] DNSSEC, successfully signed</span>
+<span class="go">2017-10-24T14:53:34 info: [example.com.] DNSSEC, next signing at 2017-10-24T14:53:44</span>
+<span class="go">...</span>
+<span class="go">2017-10-24T14:53:44 info: [example.com.] DNSSEC, signing zone</span>
+<span class="go">2017-10-24T14:53:44 info: [example.com.] DNSSEC, key, tag 34608, algorithm ECDSAP256SHA256, KSK, public, ready, active</span>
+<span class="go">2017-10-24T14:53:44 info: [example.com.] DNSSEC, key, tag 13674, algorithm ECDSAP256SHA256, public, active</span>
+<span class="go">2017-10-24T14:53:44 info: [example.com.] DNSSEC, key, tag 65225, algorithm RSASHA256, KSK, public, active</span>
+<span class="go">2017-10-24T14:53:44 info: [example.com.] DNSSEC, key, tag 47014, algorithm RSASHA256, public, active</span>
+<span class="go">2017-10-24T14:53:44 info: [example.com.] DNSSEC, signing started</span>
+<span class="go">2017-10-24T14:53:44 info: [example.com.] DNSSEC, successfully signed</span>
+<span class="go">2017-10-24T14:53:44 info: [example.com.] DNSSEC, next signing at 2017-10-31T13:52:37</span>
+<span class="go">2017-10-24T14:53:44 notice: [example.com.] DNSSEC, KSK submission, waiting for confirmation</span>
+</pre></div>
+</div>
+<p>Again, KSK submission follows as in <a class="reference internal" href="#dnssec-ksk-rollover-example"><span class="std std-ref">KSK rollover example</span></a>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">2017-10-24T14:54:20 notice: [example.com.] DNSSEC, KSK submission, confirmed</span>
+<span class="go">2017-10-24T14:54:20 info: [example.com.] DNSSEC, signing zone</span>
+<span class="go">2017-10-24T14:54:20 info: [example.com.] DNSSEC, key, tag 34608, algorithm ECDSAP256SHA256, KSK, public, active</span>
+<span class="go">2017-10-24T14:54:20 info: [example.com.] DNSSEC, key, tag 13674, algorithm ECDSAP256SHA256, public, active</span>
+<span class="go">2017-10-24T14:54:20 info: [example.com.] DNSSEC, key, tag 65225, algorithm RSASHA256, KSK, public, active</span>
+<span class="go">2017-10-24T14:54:20 info: [example.com.] DNSSEC, key, tag 47014, algorithm RSASHA256, public, active</span>
+<span class="go">2017-10-24T14:54:20 info: [example.com.] DNSSEC, signing started</span>
+<span class="go">2017-10-24T14:54:21 info: [example.com.] DNSSEC, zone is up-to-date</span>
+<span class="go">2017-10-24T14:54:21 info: [example.com.] DNSSEC, next signing at 2017-10-24T14:54:30</span>
+<span class="go">...</span>
+<span class="go">2017-10-24T14:54:30 info: [example.com.] DNSSEC, signing zone</span>
+<span class="go">2017-10-24T14:54:30 info: [example.com.] DNSSEC, key, tag 34608, algorithm ECDSAP256SHA256, KSK, public, active</span>
+<span class="go">2017-10-24T14:54:30 info: [example.com.] DNSSEC, key, tag 13674, algorithm ECDSAP256SHA256, public, active</span>
+<span class="go">2017-10-24T14:54:30 info: [example.com.] DNSSEC, key, tag 65225, algorithm RSASHA256, KSK</span>
+<span class="go">2017-10-24T14:54:30 info: [example.com.] DNSSEC, key, tag 47014, algorithm RSASHA256, active</span>
+<span class="go">2017-10-24T14:54:30 info: [example.com.] DNSSEC, signing started</span>
+<span class="go">2017-10-24T14:54:30 info: [example.com.] DNSSEC, successfully signed</span>
+<span class="go">2017-10-24T14:54:30 info: [example.com.] DNSSEC, next signing at 2017-10-24T14:54:40</span>
+<span class="go">...</span>
+<span class="go">2017-10-24T14:54:40 info: [example.com.] DNSSEC, signing zone</span>
+<span class="go">2017-10-24T14:54:40 info: [example.com.] DNSSEC, key, tag 34608, algorithm ECDSAP256SHA256, KSK, public, active</span>
+<span class="go">2017-10-24T14:54:40 info: [example.com.] DNSSEC, key, tag 13674, algorithm ECDSAP256SHA256, public, active</span>
+<span class="go">2017-10-24T14:54:40 info: [example.com.] DNSSEC, signing started</span>
+<span class="go">2017-10-24T14:54:40 info: [example.com.] DNSSEC, successfully signed</span>
+<span class="go">2017-10-24T14:54:40 info: [example.com.] DNSSEC, next signing at 2017-10-31T13:53:26</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="dnssec-shared-ksk">
+<span id="id10"></span><h2>DNSSEC shared KSK<a class="headerlink" href="#dnssec-shared-ksk" title="Permalink to this headline">¶</a></h2>
+<p>Knot DNS allows, with automatic DNSSEC key management, to configure a shared KSK for multiple zones.
+By enabling <a class="reference internal" href="reference.html#policy-ksk-shared"><span class="std std-ref">ksk-shared</span></a>, we tell Knot to share all newly-created KSKs
+among all the zones with the same <a class="reference internal" href="reference.html#policy-section"><span class="std std-ref">DNSSEC signing policy</span></a> assigned.</p>
+<p>The feature works as follows. Each zone still manages its keys separately. If a new KSK shall be
+generated for the zone, it first checks if it can grab another zone’s shared KSK instead -
+that is the last generated KSK in any of the zones with the same policy assigned.
+Anyway, only the cryptographic material is shared, the key may have different timers
+in each zone.</p>
+<p class="rubric">Consequences:</p>
+<p>If we have an initial setting with brand new zones without any DNSSEC keys,
+the initial keys for all zones are generated. With shared KSK, they will all have the same KSK,
+but different ZSKs. The KSK rollovers may take place at slightly different time for each of the zones,
+but the resulting new KSK will be shared again among all of them.</p>
+<p>If we have zones already having their keys, turning on the shared KSK feature triggers no action.
+But when a KSK rollover takes place, they will use the same new key afterwards.</p>
+</div>
+<div class="section" id="dnssec-delete-algorithm">
+<span id="id11"></span><h2>DNSSEC delete algorithm<a class="headerlink" href="#dnssec-delete-algorithm" title="Permalink to this headline">¶</a></h2>
+<p>This is a way how to “disconnect” a signed zone from DNSSEC-aware parent zone.
+More precisely, we tell the parent zone to remove our zone’s DS record by
+publishing a special formatted CDNSKEY and CDS record. This is mostly useful
+if we want to turn off DNSSEC on our zone so it becomes insecure, but not bogus.</p>
+<p>With automatic DNSSEC signing and key management by Knot, this is as easy as
+configuring <a class="reference internal" href="reference.html#policy-cds-cdnskey-publish"><span class="std std-ref">cds-cdnskey-publish</span></a> option and reloading the configuration.
+We check if the special CDNSKEY and CDS records with the rdata “0 3 0 AA==” and “0 0 0 00”,
+respectively, appeared in the zone.</p>
+<p>After the parent zone notices and reflects the change, we wait for TTL expire
+(so all resolvers’ caches get updated), and finally we may do anything with the
+zone, e.g. turning off DNSSEC, removing all the keys and signatures as desired.</p>
+</div>
+<div class="section" id="daemon-controls">
+<span id="controlling-running-daemon"></span><h2>Daemon controls<a class="headerlink" href="#daemon-controls" title="Permalink to this headline">¶</a></h2>
+<p>Knot DNS was designed to allow server reconfiguration on-the-fly
+without interrupting its operation. Thus it is possible to change
+both configuration and zone files and also add or remove zones without
+restarting the server. This can be done with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc reload
+</pre></div>
+</div>
+<p>If you want to refresh the slave zones, you can do this with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-refresh
+</pre></div>
+</div>
+</div>
+<div class="section" id="statistics">
+<span id="id12"></span><h2>Statistics<a class="headerlink" href="#statistics" title="Permalink to this headline">¶</a></h2>
+<p>The server provides some general statistics and optional query module statistics
+(see <span class="xref std std-ref">mod-stats</span>).</p>
+<p>Server statistics or global module statistics can be shown by:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc stats
+<span class="gp">$</span> knotc stats server             <span class="c1"># Show all server counters</span>
+<span class="gp">$</span> knotc stats mod-stats          <span class="c1"># Show all mod-stats counters</span>
+<span class="gp">$</span> knotc stats server.zone-count  <span class="c1"># Show specific server counter</span>
+</pre></div>
+</div>
+<p>Per zone statistics can be shown by:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-stats example.com mod-stats
+</pre></div>
+</div>
+<p>To show all supported counters even with 0 value use the force option.</p>
+<p>A simple periodic statistic dumping to a YAML file can also be enabled. See
+<a class="reference internal" href="reference.html#statistics-section"><span class="std std-ref">Statistics section</span></a> for the configuration details.</p>
+<p>As the statistics data can be accessed over the server control socket,
+it is possible to create an arbitrary script (Python is supported at the moment)
+which could, for example, publish the data in the JSON format via HTTP(S)
+or upload the data to a more efficient time series database. Take a look into
+the python folder of the project for these scripts.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Operation</a><ul>
+<li><a class="reference internal" href="#configuration-database">Configuration database</a></li>
+<li><a class="reference internal" href="#dynamic-configuration">Dynamic configuration</a></li>
+<li><a class="reference internal" href="#slave-mode">Slave mode</a></li>
+<li><a class="reference internal" href="#master-mode">Master mode</a></li>
+<li><a class="reference internal" href="#reading-and-editing-zones">Reading and editing zones</a></li>
+<li><a class="reference internal" href="#reading-and-editing-the-zone-file-safely">Reading and editing the zone file safely</a></li>
+<li><a class="reference internal" href="#zone-loading">Zone loading</a></li>
+<li><a class="reference internal" href="#journal-behaviour">Journal behaviour</a></li>
+<li><a class="reference internal" href="#handling-zone-file-journal-changes-serials">Handling zone file, journal, changes, serials</a><ul>
+<li><a class="reference internal" href="#example-1">Example 1</a></li>
+<li><a class="reference internal" href="#example-2">Example 2</a></li>
+<li><a class="reference internal" href="#example-3">Example 3</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dnssec-key-rollovers">DNSSEC key rollovers</a><ul>
+<li><a class="reference internal" href="#ksk-rollover-example">KSK rollover example</a></li>
+<li><a class="reference internal" href="#algorithm-rollover-example">Algorithm rollover example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dnssec-shared-ksk">DNSSEC shared KSK</a></li>
+<li><a class="reference internal" href="#dnssec-delete-algorithm">DNSSEC delete algorithm</a></li>
+<li><a class="reference internal" href="#daemon-controls">Daemon controls</a></li>
+<li><a class="reference internal" href="#statistics">Statistics</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="configuration.html"
+                        title="previous chapter">Configuration</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="troubleshooting.html"
+                        title="next chapter">Troubleshooting</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/operation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="troubleshooting.html" title="Troubleshooting"
+             >next</a></li>
+        <li class="right" >
+          <a href="configuration.html" title="Configuration"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

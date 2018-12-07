@@ -1,0 +1,200 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Troubleshooting &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration Reference" href="reference.html" />
+    <link rel="prev" title="Operation" href="operation.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="reference.html" title="Configuration Reference"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="operation.html" title="Operation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="troubleshooting">
+<span id="id1"></span><h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h1>
+<p>First of all, check the logs. Enabling at least the <code class="docutils literal notranslate"><span class="pre">warning</span></code> message
+severity may help you to identify some problems. See the <a class="reference internal" href="reference.html#logging-section"><span class="std std-ref">Logging section</span></a>
+for details.</p>
+<div class="section" id="reporting-bugs">
+<span id="submitting-a-bugreport"></span><h2>Reporting bugs<a class="headerlink" href="#reporting-bugs" title="Permalink to this headline">¶</a></h2>
+<p>If you are unable to solve the problem by yourself, you can submit a
+bugreport to the Knot DNS developers. For security or sensitive issues
+contact the developers directly on
+<a class="reference external" href="mailto:knot-dns&#37;&#52;&#48;labs&#46;nic&#46;cz">knot-dns<span>&#64;</span>labs<span>&#46;</span>nic<span>&#46;</span>cz</a>.
+All other bugs and questions may be directed to the public Knot DNS users
+mailing list
+(<a class="reference external" href="mailto:knot-dns-users&#37;&#52;&#48;lists&#46;nic&#46;cz">knot-dns-users<span>&#64;</span>lists<span>&#46;</span>nic<span>&#46;</span>cz</a>) or
+may be entered into the
+<a class="reference external" href="https://gitlab.labs.nic.cz/knot/knot-dns/issues">issue tracking system</a>.</p>
+<p>Before anything else, please try to answer the following questions:</p>
+<ul class="simple">
+<li>Has it been working?</li>
+<li>What has changed? System configuration, software updates, network
+configuration, firewall rules modification, hardware replacement, etc.</li>
+</ul>
+<p>The bugreport should contain the answers for the previous questions and in
+addition at least the following information:</p>
+<ul class="simple">
+<li>Knot DNS version and type of installation (distribution package, from source,
+etc.)</li>
+<li>Operating system, platform, kernel version</li>
+<li>Relevant basic hardware information (processor, amount of memory, available
+network devices, etc.)</li>
+<li>Description of the bug</li>
+<li>Log output with the highest verbosity (category <code class="docutils literal notranslate"><span class="pre">any</span></code>, severity <code class="docutils literal notranslate"><span class="pre">debug</span></code>)</li>
+<li>Steps to reproduce the bug (if known)</li>
+<li>Backtrace (if the bug caused a crash or a hang; see the next section)</li>
+</ul>
+<p>If possible, please provide a minimal configuration file and zone files which
+can be used to reproduce the bug.</p>
+</div>
+<div class="section" id="generating-backtrace">
+<span id="id2"></span><h2>Generating backtrace<a class="headerlink" href="#generating-backtrace" title="Permalink to this headline">¶</a></h2>
+<p>Backtrace carries basic information about the state of the program and how
+the program got where it is. It helps determining the location of the bug in
+the source code.</p>
+<p>If you run Knot DNS from distribution packages, make sure the debugging
+symbols for the package are installed. The symbols are usually distributed
+in a separate package.</p>
+<p>There are several ways to get the backtrace. One possible way is to extract
+the backtrace from a core dump file. Core dump is a memory snapshot generated
+by the operating system when a process crashes. The generating of core dumps
+must be usually enabled:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="nb">ulimit</span> -c unlimited                  <span class="c1"># Enable unlimited core dump size</span>
+<span class="gp">$</span> knotd ...                            <span class="c1"># Reproduce the crash</span>
+<span class="go">...</span>
+<span class="gp">$</span> gdb knotd &lt;core-dump-file&gt;           <span class="c1"># Start gdb on the core dump</span>
+<span class="go">(gdb) info threads                     # Get a summary of all threads</span>
+<span class="go">(gdb) thread apply all bt full         # Extract backtrace from all threads</span>
+<span class="go">(gdb) quit</span>
+</pre></div>
+</div>
+<p>To save the backtrace into a file, the following GDB commands can be used:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">(gdb) set pagination off</span>
+<span class="go">(gdb) set logging file backtrace.txt</span>
+<span class="go">(gdb) set logging on</span>
+<span class="go">(gdb) info threads</span>
+<span class="go">(gdb) thread apply all bt full</span>
+<span class="go">(gdb) set logging off</span>
+</pre></div>
+</div>
+<p>To generate a core dump of a running process, the <cite>gcore</cite> utility can be used:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> gcore -o &lt;output-file&gt; <span class="k">$(</span>pidof knotd<span class="k">)</span>
+</pre></div>
+</div>
+<p>Please note that core dumps can be intercepted by an error-collecting system
+service (systemd-coredump, ABRT, Apport, etc.). If you are using such a service,
+consult its documentation about core dump retrieval.</p>
+<p>If the error is reproducible, it is also possible to start and inspect the
+server directly in the debugger:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> gdb --args knotd -c /etc/knot.conf
+<span class="go">(gdb) run</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+<p>Alternatively, the debugger can be attached to a running server
+process. This is generally useful when troubleshooting a stuck process:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotd ...
+<span class="gp">$</span> gdb --pid <span class="k">$(</span>pidof knotd<span class="k">)</span>
+<span class="go">(gdb) continue</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+<p>If you fail to get a backtrace of a running process using the previous method,
+you may try the single-purpose <code class="docutils literal notranslate"><span class="pre">pstack</span></code> utility:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pstack <span class="k">$(</span>pidof knotd<span class="k">)</span> &gt; backtrace.txt
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#reporting-bugs">Reporting bugs</a></li>
+<li><a class="reference internal" href="#generating-backtrace">Generating backtrace</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="operation.html"
+                        title="previous chapter">Operation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="reference.html"
+                        title="next chapter">Configuration Reference</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/troubleshooting.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="reference.html" title="Configuration Reference"
+             >next</a></li>
+        <li class="right" >
+          <a href="operation.html" title="Operation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

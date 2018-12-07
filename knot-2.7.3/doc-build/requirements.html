@@ -1,0 +1,197 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Requirements &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="installation.html" title="Installation"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="introduction.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="requirements">
+<span id="id1"></span><h1>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="hardware">
+<h2>Hardware<a class="headerlink" href="#hardware" title="Permalink to this headline">¶</a></h2>
+<p>Knot DNS requirements are not very demanding for typical
+installations, and a commodity server or a virtual solution will be
+sufficient in most cases.</p>
+<p>However, please note that there are some scenarios that will require
+administrator’s attention and some testing of exact requirements before
+deploying Knot DNS to a production environment. These cases include
+deployment for a large number of zones (DNS hosting), large number
+of records in one or more zones (TLD), or large number of requests.</p>
+<div class="section" id="cpu-requirements">
+<h3>CPU requirements<a class="headerlink" href="#cpu-requirements" title="Permalink to this headline">¶</a></h3>
+<p>The server scales with processing power and also with the number of
+available cores/CPUs. Enabling Hyper-threading is convenient if supported.</p>
+<p>There is no lower bound on the CPU requirements, but it should support
+memory barriers and CAS (i586 and newer).</p>
+</div>
+<div class="section" id="network-card">
+<h3>Network card<a class="headerlink" href="#network-card" title="Permalink to this headline">¶</a></h3>
+<p>The best results have been achieved with multi-queue network cards. The
+number of multi-queues should equal the total number of CPU cores (with
+Hyper-threading enabled).</p>
+</div>
+<div class="section" id="memory-requirements">
+<h3>Memory requirements<a class="headerlink" href="#memory-requirements" title="Permalink to this headline">¶</a></h3>
+<p>The server implementation focuses on performance and thus can be quite
+memory demanding. The rough estimate for memory requirements is
+3 times the size of the zone in the plain-text format. Again this is only
+an estimate and you are advised to do your own measurements before
+deploying Knot DNS to production.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To ensure uninterrupted serving of the zone, Knot DNS
+employs the Read-Copy-Update mechanism instead of locking and thus
+requires twice the amount of memory for the duration of incoming
+transfers.</p>
+</div>
+</div>
+</div>
+<div class="section" id="operating-system">
+<h2>Operating system<a class="headerlink" href="#operating-system" title="Permalink to this headline">¶</a></h2>
+<p>Knot DNS itself is written in a portable way and can be compiled
+and run on most UNIX-like systems, such as Linux, *BSD, and macOS.</p>
+</div>
+<div class="section" id="required-libraries">
+<h2>Required libraries<a class="headerlink" href="#required-libraries" title="Permalink to this headline">¶</a></h2>
+<p>Knot DNS requires a few libraries to be available:</p>
+<ul class="simple">
+<li>libedit</li>
+<li>gnutls &gt;= 3.3</li>
+<li>liburcu &gt;= 0.5.4</li>
+<li>lmdb &gt;= 0.9.15</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The LMDB library is included with Knot DNS source code. However, linking
+with the system library is preferred.</p>
+</div>
+</div>
+<div class="section" id="optional-libraries">
+<h2>Optional libraries<a class="headerlink" href="#optional-libraries" title="Permalink to this headline">¶</a></h2>
+<p>International Domain Names support (IDNA2008 or IDNA2003) in <strong>kdig</strong>:</p>
+<ul class="simple">
+<li>libidn2 (or libidn)</li>
+</ul>
+<p>Systemd’s startup notification mechanism and journald logging:</p>
+<ul class="simple">
+<li>libsystemd</li>
+</ul>
+<p>Dnstap support in <strong>kdig</strong> or module <span class="xref std std-ref">dnstap</span>:</p>
+<ul class="simple">
+<li>fstrm (and protobuf-c if building from source code)</li>
+</ul>
+<p>Linux <em class="manpage">capabilities(7)</em> support, which allows the server to be started
+as a non-root user/group, binding to privileged ports (53), and giving up all
+its capabilities, resulting in a completely unprivileged process:</p>
+<ul class="simple">
+<li>libcap-ng &gt;= 0.6.4</li>
+</ul>
+<p>MaxMind database for <strong>geodb</strong> support in module <span class="xref std std-ref">geoip</span>:</p>
+<ul class="simple">
+<li>libmaxminddb0</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Requirements</a><ul>
+<li><a class="reference internal" href="#hardware">Hardware</a><ul>
+<li><a class="reference internal" href="#cpu-requirements">CPU requirements</a></li>
+<li><a class="reference internal" href="#network-card">Network card</a></li>
+<li><a class="reference internal" href="#memory-requirements">Memory requirements</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#operating-system">Operating system</a></li>
+<li><a class="reference internal" href="#required-libraries">Required libraries</a></li>
+<li><a class="reference internal" href="#optional-libraries">Optional libraries</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="introduction.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="next chapter">Installation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/requirements.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="installation.html" title="Installation"
+             >next</a></li>
+        <li class="right" >
+          <a href="introduction.html" title="Introduction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,719 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Configuration &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Operation" href="operation.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="operation.html" title="Operation"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="configuration">
+<span id="id1"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="simple-configuration">
+<h2>Simple configuration<a class="headerlink" href="#simple-configuration" title="Permalink to this headline">¶</a></h2>
+<p>The following example presents a simple configuration file
+which can be used as a base for your Knot DNS setup:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span># Example of a very simple Knot DNS configuration.
+
+server:
+    listen: 0.0.0.0@53
+    listen: ::@53
+
+zone:
+  - domain: example.com
+    storage: /var/lib/knot/zones/
+    file: example.com.zone
+
+log:
+  - target: syslog
+    any: info
+</pre></div>
+</div>
+<p>Now let’s walk through this configuration step by step:</p>
+<ul class="simple">
+<li>The <a class="reference internal" href="reference.html#server-listen"><span class="std std-ref">listen</span></a> statement in the <a class="reference internal" href="reference.html#server-section"><span class="std std-ref">server section</span></a>
+defines where the server will listen for incoming connections.
+We have defined the server to listen on all available IPv4 and IPv6 addresses,
+all on port 53.</li>
+<li>The <a class="reference internal" href="reference.html#zone-section"><span class="std std-ref">zone section</span></a> defines the zones that the server will
+serve. In this case, we defined one zone named <em>example.com</em> which is stored
+in the zone file <code class="file docutils literal notranslate"><span class="pre">/var/lib/knot/zones/example.com.zone</span></code>.</li>
+<li>The <a class="reference internal" href="reference.html#logging-section"><span class="std std-ref">log section</span></a> defines the log facilities for
+the server. In this example, we told Knot DNS to send its log messages with
+the severity <code class="docutils literal notranslate"><span class="pre">info</span></code> or more serious to the syslog.</li>
+</ul>
+<p>For detailed description of all configuration items see
+<a class="reference internal" href="reference.html#configuration-reference"><span class="std std-ref">Configuration Reference</span></a>.</p>
+</div>
+<div class="section" id="zone-templates">
+<h2>Zone templates<a class="headerlink" href="#zone-templates" title="Permalink to this headline">¶</a></h2>
+<p>A zone template allows a single zone configuration to be shared among several zones.
+The <code class="docutils literal notranslate"><span class="pre">default</span></code> template identifier is reserved for the default template:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>template:
+  - id: default
+    storage: /var/lib/knot/master
+    semantic-checks: on
+
+  - id: signed
+    storage: /var/lib/knot/signed
+    dnssec-signing: on
+    semantic-checks: on
+    master: [master1, master2]
+
+  - id: slave
+    storage: /var/lib/knot/slave
+
+zone:
+  - domain: example1.com     # Uses default template
+
+  - domain: example2.com     # Uses default template
+    semantic-checks: off     # Override default settings
+
+  - domain: example.cz
+    template: signed
+    master: master3          # Override masters to just master3
+
+  - domain: example1.eu
+    template: slave
+    master: master1
+
+  - domain: example2.eu
+    template: slave
+    master: master2
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Each template option can be explicitly overridden in zone-specific configuration.</p>
+</div>
+</div>
+<div class="section" id="access-control-list-acl">
+<span id="acl"></span><h2>Access control list (ACL)<a class="headerlink" href="#access-control-list-acl" title="Permalink to this headline">¶</a></h2>
+<p>The Access control list is a list of rules specifying remotes which are allowed to send certain types of requests to the server.
+Remotes can be specified by a single IP address or a network subnet. A TSIG
+key can also be assigned (see <a class="reference internal" href="man_keymgr.html"><span class="doc">keymgr</span></a> on how to generate a TSIG key).</p>
+<p>Without any ACL rules, all the actions are denied for the zone. Each ACL rule
+can allow one or more actions for a given address/subnet/TSIG, or deny them.</p>
+<p>If there are multiple ACL rules for a single zone, they are applied in the order
+of appearance in the <a class="reference internal" href="reference.html#zone-acl"><span class="std std-ref">acl</span></a> configuration item of a zone or a template.
+The first one to match the given remote is applied, the rest is ignored.</p>
+<p>See the following examples and <a class="reference internal" href="reference.html#acl-section"><span class="std std-ref">ACL section</span></a>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>acl:
+  - id: address_rule
+    address: [2001:db8::1, 192.168.2.0/24]
+    action: transfer
+
+  - id: deny_rule
+    address: 192.168.2.100
+    action: transfer
+    deny: on
+
+zone:
+  - domain: acl1.example.com.
+    acl: [deny_rule, address_rule] # deny_rule first here to take precendence
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>key:
+  - id: key1                  # The real TSIG key name
+    algorithm: hmac-md5
+    secret: Wg==
+
+acl:
+  - id: deny_all
+    address: 192.168.3.0/24
+    deny: on # no action specified and deny on implies denial of all actions
+
+  - id: key_rule
+    key: key1                 # Access based just on TSIG key
+    action: [transfer, notify]
+
+zone:
+  - domain: acl2.example.com
+    acl: [deny_all, key_rule]
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If more conditions (address ranges and/or a key)
+are given in a single ACL rule, all of them have to be satisfied for the rule to match.</p>
+</div>
+</div>
+<div class="section" id="slave-zone">
+<h2>Slave zone<a class="headerlink" href="#slave-zone" title="Permalink to this headline">¶</a></h2>
+<p>Knot DNS doesn’t strictly differ between master and slave zones. The
+only requirement is to have a <a class="reference internal" href="reference.html#zone-master"><span class="std std-ref">master</span></a> statement set for
+the given zone. Also note that you need to explicitly allow incoming zone
+changed notifications via <code class="docutils literal notranslate"><span class="pre">notify</span></code> <a class="reference internal" href="reference.html#acl-action"><span class="std std-ref">action</span></a> through zone’s
+<a class="reference internal" href="reference.html#zone-acl"><span class="std std-ref">acl</span></a> list, otherwise the update will be rejected by the server.
+If the zone file doesn’t exist it will be bootstrapped over AXFR:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>remote:
+  - id: master
+    address: 192.168.1.1@53
+
+acl:
+  - id: notify_from_master
+    address: 192.168.1.1
+    action: notify
+
+zone:
+  - domain: example.com
+    storage: /var/lib/knot/zones/
+    # file: example.com.zone   # Default value
+    master: master
+    acl: notify_from_master
+</pre></div>
+</div>
+<p>Note that the <a class="reference internal" href="reference.html#zone-master"><span class="std std-ref">master</span></a> option accepts a list of multiple remotes.
+The remotes should be listed according to their preference. The first remote
+has the highest preference, the other remotes are used for failover. When the
+server receives a zone update notification from a listed remote, that remote
+will be the most preferred one for the subsequent transfer.</p>
+<p>To use TSIG for transfers and notification messages authentication, configure
+a TSIG key and assign the key both to the remote and the ACL rule. Notice that
+the <a class="reference internal" href="reference.html#remote-section"><span class="std std-ref">remote</span></a> and <a class="reference internal" href="reference.html#acl-section"><span class="std std-ref">ACL</span></a> definitions are
+independent:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>key:
+  - id: slave1_key
+    algorithm: hmac-md5
+    secret: Wg==
+
+remote:
+  - id: master
+    address: 192.168.1.1@53
+    key: slave1_key
+
+acl:
+  - id: notify_from_master
+    address: 192.168.1.1
+    key: slave1_key
+    action: notify
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>When transferring a lot of zones, the server may easily get into a state
+when all available ports are in the TIME_WAIT state, thus the transfers
+seize until the operating system closes the ports for good. There are
+several ways to work around this:</p>
+<ul class="last simple">
+<li>Allow reusing of ports in TIME_WAIT (sysctl -w net.ipv4.tcp_tw_reuse=1)</li>
+<li>Shorten TIME_WAIT timeout (tcp_fin_timeout)</li>
+<li>Increase available local port count</li>
+</ul>
+</div>
+</div>
+<div class="section" id="master-zone">
+<h2>Master zone<a class="headerlink" href="#master-zone" title="Permalink to this headline">¶</a></h2>
+<p>An ACL with the <code class="docutils literal notranslate"><span class="pre">transfer</span></code> action must be configured to allow outgoing zone
+transfers. An ACL rule consists of a single address or a network subnet:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>remote:
+  - id: slave1
+    address: 192.168.2.1@53
+
+acl:
+  - id: slave1_acl
+    address: 192.168.2.1
+    action: transfer
+
+  - id: others_acl
+    address: 192.168.3.0/24
+    action: transfer
+
+zone:
+  - domain: example.com
+    storage: /var/lib/knot/zones/
+    file: example.com.zone
+    notify: slave1
+    acl: [slave1_acl, others_acl]
+</pre></div>
+</div>
+<p>Optionally, a TSIG key can be specified:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>key:
+  - id: slave1_key
+    algorithm: hmac-md5
+    secret: Wg==
+
+remote:
+  - id: slave1
+    address: 192.168.2.1@53
+    key: slave1_key
+
+acl:
+  - id: slave1_acl
+    address: 192.168.2.1
+    key: slave1_key
+    action: transfer
+
+  - id: others_acl
+    address: 192.168.3.0/24
+    action: transfer
+</pre></div>
+</div>
+<p>Note that a slave zone may serve as a master zone at the same time:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>remote:
+  - id: master
+    address: 192.168.1.1@53
+  - id: slave1
+    address: 192.168.2.1@53
+
+acl:
+  - id: notify_from_master
+    address: 192.168.1.1
+    action: notify
+
+  - id: slave1_acl
+    address: 192.168.2.1
+    action: transfer
+
+  - id: others_acl
+    address: 192.168.3.0/24
+    action: transfer
+
+zone:
+  - domain: example.com
+    storage: /var/lib/knot/zones/
+    file: example.com.zone
+    master: master
+    notify: slave1
+    acl: [notify_from_master, slave1_acl, others_acl]
+</pre></div>
+</div>
+</div>
+<div class="section" id="dynamic-updates">
+<h2>Dynamic updates<a class="headerlink" href="#dynamic-updates" title="Permalink to this headline">¶</a></h2>
+<p>Dynamic updates for the zone are allowed via proper ACL rule with the
+<code class="docutils literal notranslate"><span class="pre">update</span></code> action. If the zone is configured as a slave and a DNS update
+message is accepted, the server forwards the message to its primary master.
+The master’s response is then forwarded back to the originator.</p>
+<p>However, if the zone is configured as a master, the update is accepted and
+processed:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>acl:
+  - id: update_acl
+    address: 192.168.3.0/24
+    action: update
+
+zone:
+  - domain: example.com
+    file: example.com.zone
+    acl: update_acl
+</pre></div>
+</div>
+</div>
+<div class="section" id="automatic-dnssec-signing">
+<span id="dnssec"></span><h2>Automatic DNSSEC signing<a class="headerlink" href="#automatic-dnssec-signing" title="Permalink to this headline">¶</a></h2>
+<p>Knot DNS supports automatic DNSSEC signing for static zones. The signing
+can operate in two modes:</p>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#dnssec-automatic-zsk-management"><span class="std std-ref">Automatic key management</span></a>.
+In this mode, the server maintains signing keys. New keys are generated
+according to assigned policy and are rolled automatically in a safe manner.
+No zone operator intervention is necessary.</li>
+<li><a class="reference internal" href="#dnssec-manual-key-management"><span class="std std-ref">Manual key management</span></a>.
+In this mode, the server maintains zone signatures only. The signatures
+are kept up-to-date and signing keys are rolled according to timing
+parameters assigned to the keys. The keys must be generated and timing
+parameters must be assigned by the zone operator.</li>
+</ol>
+<p>The DNSSEC signing process maintains some metadata which is stored in the
+<abbr title="Key And Signature Policy">KASP</abbr> database. This database is backed
+by LMDB.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Make sure to set the KASP database permissions correctly. For manual key
+management, the database must be <em>readable</em> by the server process. For
+automatic key management, it must be <em>writeable</em>. If no HSM is used,
+the database also contains private key material – don’t set the permissions
+too weak.</p>
+</div>
+<div class="section" id="automatic-zsk-management">
+<span id="dnssec-automatic-zsk-management"></span><h3>Automatic ZSK management<a class="headerlink" href="#automatic-zsk-management" title="Permalink to this headline">¶</a></h3>
+<p>For automatic ZSK management a signing <a class="reference internal" href="reference.html#policy-section"><span class="std std-ref">policy</span></a> has to
+be configured and assigned to the zone. The policy specifies how the zone
+is signed (i.e. signing algorithm, key size, key lifetime, signature lifetime,
+etc.). If no policy is specified or the <code class="docutils literal notranslate"><span class="pre">default</span></code> one is assigned, the
+default signing parameters are used.</p>
+<p>A minimal zone configuration may look as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>zone:
+  - domain: myzone.test
+    dnssec-signing: on
+</pre></div>
+</div>
+<p>With a custom signing policy, the policy section will be added:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>policy:
+  - id: rsa
+    algorithm: RSASHA256
+    ksk-size: 2048
+    zsk-size: 1024
+
+zone:
+  - domain: myzone.test
+    dnssec-signing: on
+    dnssec-policy: rsa
+</pre></div>
+</div>
+<p>After configuring the server, reload the changes:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc reload
+</pre></div>
+</div>
+<p>The server will generate initial signing keys and sign the zone properly. Check
+the server logs to see whether everything went well.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This guide assumes that the zone <em>myzone.test</em> was not signed prior to
+enabling the automatic key management. If the zone was already signed, all
+existing keys must be imported using <code class="docutils literal notranslate"><span class="pre">keymgr</span> <span class="pre">import-bind</span></code> command
+before enabling the automatic signing. Also the algorithm in the policy must
+match the algorithm of all imported keys. Otherwise the zone will be re-signed
+at all.</p>
+</div>
+</div>
+<div class="section" id="automatic-ksk-management">
+<span id="dnssec-automatic-ksk-management"></span><h3>Automatic KSK management<a class="headerlink" href="#automatic-ksk-management" title="Permalink to this headline">¶</a></h3>
+<p>For automatic KSK management, first configure ZSK management like above, and use
+additional options in <a class="reference internal" href="reference.html#policy-section"><span class="std std-ref">policy section</span></a>, mostly specifying
+desired (finite) lifetime for KSK:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>remote:
+  - id: test_zone_server
+    address: 192.168.12.1@53
+
+submission:
+  - id: test_zone_sbm
+    parent: [test_zone_server]
+
+policy:
+  - id: rsa
+    algorithm: RSASHA256
+    ksk-size: 2048
+    zsk-size: 1024
+    zsk-lifetime: 30d
+    ksk-lifetime: 365d
+    ksk-submission: test_zone_sbm
+
+zone:
+  - domain: myzone.test
+    dnssec-signing: on
+    dnssec-policy: rsa
+</pre></div>
+</div>
+<p>After the initially-generated KSK reaches its lifetime, new KSK is published and after
+convenience delay the submission is started. The server publishes CDS and CDNSKEY records
+and the user shall propagate them to the parent. The server periodically checks for
+DS at the master and when positive, finishes the rollover.</p>
+<p>To share KSKs among zones, set the ksk-shared policy parameter. It is strongly discouraged to
+change the policy <code class="docutils literal notranslate"><span class="pre">id</span></code> afterwards! The shared key’s creation timestamp will be equal for all
+zones, but other timers (e.g. activate, retire) may get out of sync.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>policy:
+  - id: shared
+    ...
+    ksk-shared: true
+
+zone:
+  - domain: firstzone.test
+    dnssec-signing: on
+    dnssec-policy: shared
+
+zone:
+  - domain: secondzone.test
+    dnssec-signing: on
+    dnssec-policy: shared
+</pre></div>
+</div>
+</div>
+<div class="section" id="manual-key-management">
+<span id="dnssec-manual-key-management"></span><h3>Manual key management<a class="headerlink" href="#manual-key-management" title="Permalink to this headline">¶</a></h3>
+<p>For automatic DNSSEC signing with manual key management, a signing policy
+with manual key management flag has to be set:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>policy:
+  - id: manual
+    manual: on
+
+zone:
+  - domain: myzone.test
+    dnssec-signing: on
+    dnssec-policy: manual
+</pre></div>
+</div>
+<p>To generate signing keys, use the <a class="reference internal" href="man_keymgr.html"><span class="doc">keymgr</span></a> utility.
+Let’s use the Single-Type Signing scheme with two algorithms. Run:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> keymgr myzone.test. generate <span class="nv">algorithm</span><span class="o">=</span>ECDSAP256SHA256
+<span class="gp">$</span> keymgr myzone.test. generate <span class="nv">algorithm</span><span class="o">=</span>ED25519
+</pre></div>
+</div>
+<p>And reload the server. The zone will be signed.</p>
+<p>To perform a manual rollover of a key, the timing parameters of the key need
+to be set. Let’s roll the RSA key. Generate a new RSA key, but do not activate
+it yet:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> keymgr myzone.test. generate <span class="nv">algorithm</span><span class="o">=</span>RSASHA256 <span class="nv">size</span><span class="o">=</span><span class="m">1024</span> <span class="nv">active</span><span class="o">=</span>+1d
+</pre></div>
+</div>
+<p>Take the key ID (or key tag) of the old RSA key and disable it the same time
+the new key gets activated:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> keymgr myzone.test. <span class="nb">set</span> &lt;old_key_id&gt; <span class="nv">retire</span><span class="o">=</span>+1d <span class="nv">remove</span><span class="o">=</span>+1d
+</pre></div>
+</div>
+<p>Reload the server again. The new key will be published (i.e. the DNSKEY record
+will be added into the zone). Do not forget to update the DS record in the
+parent zone to include a reference to the new RSA key. This must happen in one
+day (in this case) including a delay required to propagate the new DS to
+caches.</p>
+<p>Note that as the <code class="docutils literal notranslate"><span class="pre">+1d</span></code> time specification is computed from the current time,
+the key replacement will not happen at once. First, a new key will be
+activated.  A few moments later, the old key will be deactivated and removed.
+You can use exact time specification to make these two actions happen in one
+go.</p>
+</div>
+<div class="section" id="zone-signing">
+<span id="dnssec-signing"></span><h3>Zone signing<a class="headerlink" href="#zone-signing" title="Permalink to this headline">¶</a></h3>
+<p>The signing process consists of the following steps:</p>
+<ol class="arabic simple">
+<li>Processing KASP database events. (e.g. performing a step of a rollover).</li>
+<li>Updating the DNSKEY records. The whole DNSKEY set in zone apex is replaced
+by the keys from the KASP database. Note that keys added into the zone file
+manually will be removed. To add an extra DNSKEY record into the set, the
+key must be imported into the KASP database (possibly deactivated).</li>
+<li>Fixing the NSEC or NSEC3 chain.</li>
+<li>Removing expired signatures, invalid signatures, signatures expiring
+in a short time, and signatures issued by an unknown key.</li>
+<li>Creating missing signatures. Unless the Single-Type Signing Scheme
+is used, DNSKEY records in a zone apex are signed by KSK keys and
+all other records are signed by ZSK keys.</li>
+<li>Updating and re-signing SOA record.</li>
+</ol>
+<p>The signing is initiated on the following occasions:</p>
+<ul class="simple">
+<li>Start of the server</li>
+<li>Zone reload</li>
+<li>Reaching the signature refresh period</li>
+<li>Key set changed due to rollover event</li>
+<li>Received DDNS update</li>
+<li>Forced zone re-sign via server control interface</li>
+</ul>
+<p>On a forced zone re-sign, all signatures in the zone are dropped and recreated.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">knotc</span> <span class="pre">zone-status</span></code> command can be used to see when the next scheduled
+DNSSEC re-sign will happen.</p>
+</div>
+<div class="section" id="on-slave-signing">
+<span id="dnssec-on-slave-signing"></span><h3>On-slave signing<a class="headerlink" href="#on-slave-signing" title="Permalink to this headline">¶</a></h3>
+<p>It is possible to enable automatic DNSSEC zone signing even on a slave
+server. If enabled, the zone is signed after every AXFR/IXFR transfer
+from master, so that the slave always serves a signed up-to-date version
+of the zone.</p>
+<p>It is strongly recommended to block any outside access to the master
+server, so that only the slave’s signed version of the zone is served.</p>
+<p>Enabled on-slave signing introduces events when the slave zone changes
+while the master zone remains unchanged, such as a key rollover or
+refreshing of RRSIG records, which cause inequality of zone SOA serial
+between master and slave. The slave server handles this by saving the
+master’s SOA serial in a special variable inside KASP DB and appropriately
+modifiying AXFR/IXFR queries/answers to keep the communication with
+master consistent while applying the changes with a different serial.</p>
+<p>It is recommended to use UNIX time serial policy on master and incremental
+serial policy on slave so that their SOA serials are equal most of the time.</p>
+</div>
+</div>
+<div class="section" id="query-modules">
+<span id="id2"></span><h2>Query modules<a class="headerlink" href="#query-modules" title="Permalink to this headline">¶</a></h2>
+<p>Knot DNS supports configurable query modules that can alter the way
+queries are processed. Each query requires a finite number of steps to
+be resolved. We call this set of steps a <em>query plan</em>, an abstraction
+that groups these steps into several stages.</p>
+<ul class="simple">
+<li>Before-query processing</li>
+<li>Answer, Authority, Additional records packet sections processing</li>
+<li>After-query processing</li>
+</ul>
+<p>For example, processing an Internet-class query needs to find an
+answer. Then based on the previous state, it may also append an
+authority SOA or provide additional records. Each of these actions
+represents a ‘processing step’. Now, if a query module is loaded for a
+zone, it is provided with an implicit query plan which can be extended
+by the module or even changed altogether.</p>
+<p>A module is active if its name, which includes the <code class="docutils literal notranslate"><span class="pre">mod-</span></code> prefix, is assigned
+to the zone/template <a class="reference internal" href="reference.html#zone-module"><span class="std std-ref">module</span></a> option or to the <code class="docutils literal notranslate"><span class="pre">default</span></code> template
+<a class="reference internal" href="reference.html#template-global-module"><span class="std std-ref">global-module</span></a> option if activating for all queries.
+If the module is configurable, a corresponding module section with
+an identifier must be created and then referenced in the form of
+<code class="docutils literal notranslate"><span class="pre">module_name/module_id</span></code>. See <span class="xref std std-ref">Modules</span> for the list of available modules.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Query modules are processed in the order they are specified in the
+zone/template configuration. In most cases, the recommended order is:</p>
+<div class="last highlight-none notranslate"><div class="highlight"><pre><span></span>mod-synthrecord, mod-onlinesign, mod-rrl, mod-dnstap, mod-stats
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="performance-tuning">
+<h2>Performance Tuning<a class="headerlink" href="#performance-tuning" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="numbers-of-workers">
+<h3>Numbers of Workers<a class="headerlink" href="#numbers-of-workers" title="Permalink to this headline">¶</a></h3>
+<p>There are three types of workers ready for parallel execution of performance-oriented tasks:
+UDP workers, TCP workers, and Background workers. The first two types handle all network requests
+coming through UDP and TCP protocol (respectively) and do all the response job for common
+queries. Background workers process changes to the zone.</p>
+<p>By default, Knot determines well-fitting number of workers based on the number of CPU cores.
+The user can specify the numbers of workers for each type with configuration/server section:
+<a class="reference internal" href="reference.html#server-udp-workers"><span class="std std-ref">udp-workers</span></a>, <a class="reference internal" href="reference.html#server-tcp-workers"><span class="std std-ref">tcp-workers</span></a>, <a class="reference internal" href="reference.html#server-background-workers"><span class="std std-ref">background-workers</span></a>.</p>
+<p>An indication on when to increase number of workers is a situation when the server is lagging behind
+the expected performance, while the CPU usage is low. This is usually because of waiting for network
+or I/O response during the operation. It may be caused by Knot design not fitting well the usecase.
+The user should try increasing the number of workers (of the related type) slightly above 100 and if
+the performance gets better, he can decide about further exact setting.</p>
+</div>
+<div class="section" id="sysctl-and-nic-optimizations">
+<h3>Sysctl and NIC optimizations<a class="headerlink" href="#sysctl-and-nic-optimizations" title="Permalink to this headline">¶</a></h3>
+<p>There are several recommendations based on Knot developers’ experience with their specific HW and SW
+(mainstream Intel-based servers, Debian-based GNU/Linux distribution). They may or may not positively
+(or negatively) influence performance in common use cases.</p>
+<p>If your NIC driver allows it (see /proc/interrupts for hint), set CPU affinity (/proc/irq/$IRQ/smp_affinity)
+manually so that each NIC channel is served by unique CPU core(s). You must turn off irqbalance service
+before to avoid configuration override.</p>
+<p>Configure sysctl as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>socket_bufsize=1048576
+busy_latency=0
+backlog=40000
+optmem_max=20480
+
+net.core.wmem_max     = $socket_bufsize
+net.core.wmem_default = $socket_bufsize
+net.core.rmem_max     = $socket_bufsize
+net.core.rmem_default = $socket_bufsize
+net.core.busy_read = $busy_latency
+net.core.busy_poll = $busy_latency
+net.core.netdev_max_backlog = $backlog
+net.core.optmem_max = $optmem_max
+</pre></div>
+</div>
+<p>Disable huge pages.</p>
+<p>Configure your CPU to “performance” mode. This can be achieved depending on architecture, e.g. in BIOS,
+or e.g. configuring /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor to “performance”.</p>
+<p>Tune your NIC device with ethtool:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ethtool -A $dev autoneg off rx off tx off
+ethtool -K $dev tso off gro off ufo off
+ethtool -G $dev rx 4096 tx 4096
+ethtool -C $dev rx-usecs 75
+ethtool -C $dev tx-usecs 75
+ethtool -N $dev rx-flow-hash udp4 sdfn
+ethtool -N $dev rx-flow-hash udp6 sdfn
+</pre></div>
+</div>
+<p>On FreeBSD you can just:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ifconfig ${dev} -rxcsum -txcsum -lro -tso
+</pre></div>
+</div>
+<p>Knot developers are open to hear about users’ further suggestions about network devices tuning/optimization.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Configuration</a><ul>
+<li><a class="reference internal" href="#simple-configuration">Simple configuration</a></li>
+<li><a class="reference internal" href="#zone-templates">Zone templates</a></li>
+<li><a class="reference internal" href="#access-control-list-acl">Access control list (ACL)</a></li>
+<li><a class="reference internal" href="#slave-zone">Slave zone</a></li>
+<li><a class="reference internal" href="#master-zone">Master zone</a></li>
+<li><a class="reference internal" href="#dynamic-updates">Dynamic updates</a></li>
+<li><a class="reference internal" href="#automatic-dnssec-signing">Automatic DNSSEC signing</a><ul>
+<li><a class="reference internal" href="#automatic-zsk-management">Automatic ZSK management</a></li>
+<li><a class="reference internal" href="#automatic-ksk-management">Automatic KSK management</a></li>
+<li><a class="reference internal" href="#manual-key-management">Manual key management</a></li>
+<li><a class="reference internal" href="#zone-signing">Zone signing</a></li>
+<li><a class="reference internal" href="#on-slave-signing">On-slave signing</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#query-modules">Query modules</a></li>
+<li><a class="reference internal" href="#performance-tuning">Performance Tuning</a><ul>
+<li><a class="reference internal" href="#numbers-of-workers">Numbers of Workers</a></li>
+<li><a class="reference internal" href="#sysctl-and-nic-optimizations">Sysctl and NIC optimizations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="previous chapter">Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="operation.html"
+                        title="next chapter">Operation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/configuration.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="operation.html" title="Operation"
+             >next</a></li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

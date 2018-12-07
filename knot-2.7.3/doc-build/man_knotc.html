@@ -1,0 +1,334 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>knotc – Knot DNS control utility &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="knotd – Knot DNS server daemon" href="man_knotd.html" />
+    <link rel="prev" title="kjournalprint – Knot DNS journal print utility" href="man_kjournalprint.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="man_knotd.html" title="knotd – Knot DNS server daemon"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="man_kjournalprint.html" title="kjournalprint – Knot DNS journal print utility"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="utilities.html" accesskey="U">Utilities</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="knotc-knot-dns-control-utility">
+<h1>knotc – Knot DNS control utility<a class="headerlink" href="#knotc-knot-dns-control-utility" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><strong class="program">knotc</strong> [<em>parameters</em>] <em>action</em> [<em>action_args</em>]</p>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>If no <em>action</em> is specified, the program is executed in interactive mode.</p>
+<div class="section" id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>-c</strong>, <strong>–config</strong> <em>file</em></dt>
+<dd>Use a textual configuration file (default is <code class="file docutils literal notranslate"><span class="pre">&#64;config_dir&#64;/knot.conf</span></code>).</dd>
+<dt><strong>-C</strong>, <strong>–confdb</strong> <em>directory</em></dt>
+<dd>Use a binary configuration database directory (default is <code class="file docutils literal notranslate"><span class="pre">&#64;storage_dir&#64;/confdb</span></code>).
+The default configuration database, if exists, has a preference to the default
+configuration file.</dd>
+<dt><strong>-m</strong>, <strong>–max-conf-size</strong> <em>MiB</em></dt>
+<dd>Set maximum configuration size (default is &#64;conf_mapsize&#64; MiB, maximum 10000 MiB).</dd>
+<dt><strong>-s</strong>, <strong>–socket</strong> <em>path</em></dt>
+<dd>Use a control UNIX socket path (default is <code class="file docutils literal notranslate"><span class="pre">&#64;run_dir&#64;/knot.sock</span></code>).</dd>
+<dt><strong>-t</strong>, <strong>–timeout</strong> <em>seconds</em></dt>
+<dd>Use a control timeout in seconds. Set 0 for infinity (default is 5).</dd>
+<dt><strong>-f</strong>, <strong>–force</strong></dt>
+<dd>Forced operation. Overrides some checks.</dd>
+<dt><strong>-v</strong>, <strong>–verbose</strong></dt>
+<dd>Enable debug output.</dd>
+<dt><strong>-h</strong>, <strong>–help</strong></dt>
+<dd>Print the program help.</dd>
+<dt><strong>-V</strong>, <strong>–version</strong></dt>
+<dd>Print the program version.</dd>
+</dl>
+</div>
+<div class="section" id="actions">
+<h3>Actions<a class="headerlink" href="#actions" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>status</strong> [<em>detail</em>]</dt>
+<dd>Check if the server is running. Details are <strong>version</strong> for the running
+server version, <strong>workers</strong> for the numbers of worker threads,
+or <strong>configure</strong> for the configure summary.</dd>
+<dt><strong>stop</strong></dt>
+<dd>Stop the server if running.</dd>
+<dt><strong>reload</strong></dt>
+<dd>Reload the server configuration and modified zone files. All open zone
+transactions will be aborted!</dd>
+<dt><strong>stats</strong> [<em>module</em>[<strong>.</strong><em>counter</em>]]</dt>
+<dd>Show global statistics counter(s). To print also counters with value 0, use
+force option.</dd>
+<dt><strong>zone-status</strong> <em>zone</em> [<em>filter</em>]</dt>
+<dd>Show the zone status. Filters are <strong>+role</strong>, <strong>+serial</strong>, <strong>+transaction</strong>,
+<strong>+events</strong>, and <strong>+freeze</strong>.</dd>
+<dt><strong>zone-check</strong> [<em>zone</em>…]</dt>
+<dd>Test if the server can load the zone. Semantic checks are executed if enabled
+in the configuration. (*)</dd>
+<dt><strong>zone-memstats</strong> [<em>zone</em>…]</dt>
+<dd>Estimate memory use for the zone. (*)</dd>
+<dt><strong>zone-reload</strong> [<em>zone</em>…]</dt>
+<dd>Trigger a zone reload from a disk without checking its modification time. For
+slave zone, the refresh from a master server is scheduled; for master zone,
+the notification of slave servers is scheduled. An open zone transaction
+will be aborted!</dd>
+<dt><strong>zone-refresh</strong> [<em>zone</em>…]</dt>
+<dd>Trigger a check for the zone serial on the zone’s master. If the master has a
+newer zone, a transfer is scheduled. This command is valid for slave zones.</dd>
+<dt><strong>zone-retransfer</strong> [<em>zone</em>…]</dt>
+<dd>Trigger a zone transfer from the zone’s master. The server doesn’t check the
+serial of the master’s zone. This command is valid for slave zones.</dd>
+<dt><strong>zone-notify</strong> [<em>zone</em>…]</dt>
+<dd>Trigger a NOTIFY message to all configured remotes. This can help in cases
+when previous NOTIFY had been lost or the slaves offline.</dd>
+<dt><strong>zone-flush</strong> [<em>zone</em>…] [<strong>+outdir</strong> <em>directory</em>]</dt>
+<dd>Trigger a zone journal flush into the zone file. If output dir is specified,
+instead of flushing the zonefile, the zone is dumped to a file in the specified
+directory.</dd>
+<dt><strong>zone-sign</strong> [<em>zone</em>…]</dt>
+<dd>Trigger a DNSSEC re-sign of the zone. Existing signatures will be dropped.
+This command is valid for zones with DNSSEC signing enabled.</dd>
+<dt><strong>zone-ksk-submitted</strong> <em>zone</em>…</dt>
+<dd>Use when the zone’s KSK rollover is in submittion phase. By calling this command
+the user confirms manually that the parent zone contains DS record for the new
+KSK in submission phase and the old KSK can be retired.</dd>
+<dt><strong>zone-freeze</strong> [<em>zone</em>…]</dt>
+<dd>Temporarily postpone zone-changing events (load, refresh, update, flush, and
+DNSSEC signing).</dd>
+<dt><strong>zone-thaw</strong> [<em>zone</em>…]</dt>
+<dd>Dismiss zone freeze.</dd>
+<dt><strong>zone-read</strong> <em>zone</em> [<em>owner</em> [<em>type</em>]]</dt>
+<dd>Get zone data that are currently being presented.</dd>
+<dt><strong>zone-begin</strong> <em>zone</em>…</dt>
+<dd>Begin a zone transaction.</dd>
+<dt><strong>zone-commit</strong> <em>zone</em>…</dt>
+<dd>Commit the zone transaction. All changes are applied to the zone.</dd>
+<dt><strong>zone-abort</strong> <em>zone</em>…</dt>
+<dd>Abort the zone transaction. All changes are discarded.</dd>
+<dt><strong>zone-diff</strong> <em>zone</em></dt>
+<dd>Get zone changes within the transaction.</dd>
+<dt><strong>zone-get</strong> <em>zone</em> [<em>owner</em> [<em>type</em>]]</dt>
+<dd>Get zone data within the transaction.</dd>
+<dt><strong>zone-set</strong> <em>zone</em> <em>owner</em> [<em>ttl</em>] <em>type</em> <em>rdata</em></dt>
+<dd>Add zone record within the transaction. The first record in a rrset
+requires a ttl value specified.</dd>
+<dt><strong>zone-unset</strong> <em>zone</em> <em>owner</em> [<em>type</em> [<em>rdata</em>]]</dt>
+<dd>Remove zone data within the transaction.</dd>
+<dt><strong>zone-purge</strong> <em>zone</em>… [<em>filter</em>…]</dt>
+<dd>Purge zone data, zone file, journal, timers, and/or KASP data of specified zones.
+Available filters are <strong>+expire</strong>, <strong>+zonefile</strong>, <strong>+journal</strong>, <strong>+timers</strong>,
+and <strong>+kaspdb</strong>. If no filter is specified, all filters are enabled.
+If the zone is no longer configured, add <strong>+orphan</strong> filter (zone file cannot
+be purged in this case).</dd>
+<dt><strong>zone-stats</strong> <em>zone</em> [<em>module</em>[<strong>.</strong><em>counter</em>]]</dt>
+<dd>Show zone statistics counter(s). To print also counters with value 0, use
+force option.</dd>
+<dt><strong>conf-init</strong></dt>
+<dd>Initialize the configuration database. (*)</dd>
+<dt><strong>conf-check</strong></dt>
+<dd>Check the server configuration. (*)</dd>
+<dt><strong>conf-import</strong> <em>filename</em></dt>
+<dd>Import a configuration file into the configuration database. Ensure the
+server is not using the configuration database! (*)</dd>
+<dt><strong>conf-export</strong> [<em>filename</em>]</dt>
+<dd>Export the configuration database into a config file or stdout. (*)</dd>
+<dt><strong>conf-list</strong> [<em>item</em>]</dt>
+<dd>List the configuration database sections or section items.</dd>
+<dt><strong>conf-read</strong> [<em>item</em>]</dt>
+<dd>Read the item from the active configuration database.</dd>
+<dt><strong>conf-begin</strong></dt>
+<dd>Begin a writing configuration database transaction. Only one transaction
+can be opened at a time.</dd>
+<dt><strong>conf-commit</strong></dt>
+<dd>Commit the configuration database transaction.</dd>
+<dt><strong>conf-abort</strong></dt>
+<dd>Rollback the configuration database transaction.</dd>
+<dt><strong>conf-diff</strong> [<em>item</em>]</dt>
+<dd>Get the item difference in the transaction.</dd>
+<dt><strong>conf-get</strong> [<em>item</em>]</dt>
+<dd>Get the item data from the transaction.</dd>
+<dt><strong>conf-set</strong> <em>item</em> [<em>data</em>…]</dt>
+<dd>Set the item data in the transaction.</dd>
+<dt><strong>conf-unset</strong> [<em>item</em>] [<em>data</em>…]</dt>
+<dd>Unset the item data in the transaction.</dd>
+</dl>
+</div>
+<div class="section" id="note">
+<h3>Note<a class="headerlink" href="#note" title="Permalink to this headline">¶</a></h3>
+<p>Empty or <strong>–</strong> <em>zone</em> parameter means all zones or all zones with a transaction.</p>
+<p>Use <strong>&#64;</strong> <em>owner</em> to denote the zone name.</p>
+<p>Type <em>item</em> parameter in the form of <em>section</em>[<strong>[</strong><em>id</em><strong>]</strong>][<strong>.</strong><em>name</em>].</p>
+<p>(*) indicates a local operation which requires a configuration.</p>
+</div>
+<div class="section" id="interactive-mode">
+<h3>Interactive mode<a class="headerlink" href="#interactive-mode" title="Permalink to this headline">¶</a></h3>
+<p>The utility provides interactive mode with basic line editing functionality,
+command completion, and command history.</p>
+<p>Interactive mode behavior can be customized in <cite>~/.editrc</cite>. Refer to
+<em class="manpage">editrc(5)</em> for details.</p>
+<p>Command history is saved in <cite>~/.knotc_history</cite>.</p>
+</div>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="reload-the-whole-server-configuration">
+<h3>Reload the whole server configuration<a class="headerlink" href="#reload-the-whole-server-configuration" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc reload
+</pre></div>
+</div>
+</div>
+<div class="section" id="flush-the-example-com-and-example-org-zones">
+<h3>Flush the example.com and example.org zones<a class="headerlink" href="#flush-the-example-com-and-example-org-zones" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-flush example.com example.org
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-the-current-server-configuration">
+<h3>Get the current server configuration<a class="headerlink" href="#get-the-current-server-configuration" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-read server
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-the-list-of-the-current-zones">
+<h3>Get the list of the current zones<a class="headerlink" href="#get-the-list-of-the-current-zones" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-read zone.domain
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-the-master-remotes-for-the-example-com-zone">
+<h3>Get the master remotes for the example.com zone<a class="headerlink" href="#get-the-master-remotes-for-the-example-com-zone" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-read <span class="s1">&#39;zone[example.com].master&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="add-example-org-zone-with-a-zonefile-location">
+<h3>Add example.org zone with a zonefile location<a class="headerlink" href="#add-example-org-zone-with-a-zonefile-location" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc conf-begin
+<span class="gp">$</span> knotc conf-set <span class="s1">&#39;zone[example.org]&#39;</span>
+<span class="gp">$</span> knotc conf-set <span class="s1">&#39;zone[example.org].file&#39;</span> <span class="s1">&#39;/var/zones/example.org.zone&#39;</span>
+<span class="gp">$</span> knotc conf-commit
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-the-soa-record-for-each-configured-zone">
+<h3>Get the SOA record for each configured zone<a class="headerlink" href="#get-the-soa-record-for-each-configured-zone" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> knotc zone-read -- @ SOA
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<p><em class="manpage">knotd(8)</em>, <em class="manpage">knot.conf(5)</em>, <em class="manpage">editrc(5)</em>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">knotc – Knot DNS control utility</a><ul>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a><ul>
+<li><a class="reference internal" href="#parameters">Parameters</a></li>
+<li><a class="reference internal" href="#actions">Actions</a></li>
+<li><a class="reference internal" href="#note">Note</a></li>
+<li><a class="reference internal" href="#interactive-mode">Interactive mode</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#reload-the-whole-server-configuration">Reload the whole server configuration</a></li>
+<li><a class="reference internal" href="#flush-the-example-com-and-example-org-zones">Flush the example.com and example.org zones</a></li>
+<li><a class="reference internal" href="#get-the-current-server-configuration">Get the current server configuration</a></li>
+<li><a class="reference internal" href="#get-the-list-of-the-current-zones">Get the list of the current zones</a></li>
+<li><a class="reference internal" href="#get-the-master-remotes-for-the-example-com-zone">Get the master remotes for the example.com zone</a></li>
+<li><a class="reference internal" href="#add-example-org-zone-with-a-zonefile-location">Add example.org zone with a zonefile location</a></li>
+<li><a class="reference internal" href="#get-the-soa-record-for-each-configured-zone">Get the SOA record for each configured zone</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="man_kjournalprint.html"
+                        title="previous chapter">kjournalprint – Knot DNS journal print utility</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="man_knotd.html"
+                        title="next chapter">knotd – Knot DNS server daemon</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/man_knotc.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="man_knotd.html" title="knotd – Knot DNS server daemon"
+             >next</a></li>
+        <li class="right" >
+          <a href="man_kjournalprint.html" title="kjournalprint – Knot DNS journal print utility"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="utilities.html" >Utilities</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+---- synchronize_rcu Matches (6 in 5 files) ----
+conf_update in base.c (src\knot\conf) : 	synchronize_rcu();
+event_expire in expire.c (src\knot\events\handlers) : 	synchronize_rcu();
+sink_publish in log.c (src\knot\common) : 	synchronize_rcu();
+mod_load in module.c (src\knot\conf) : 	synchronize_rcu();
+conf_mod_load_purge in module.c (src\knot\conf) : 		synchronize_rcu();
+zonedb_reload in zonedb-load.c (src\knot\zone) : 	synchronize_rcu();

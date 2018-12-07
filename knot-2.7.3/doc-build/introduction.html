@@ -1,0 +1,163 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Introduction &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Requirements" href="requirements.html" />
+    <link rel="prev" title="Welcome to Knot DNS’s documentation!" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="requirements.html" title="Requirements"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Knot DNS’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<span id="id1"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-knot-dns">
+<h2>What is Knot DNS<a class="headerlink" href="#what-is-knot-dns" title="Permalink to this headline">¶</a></h2>
+<p>Knot DNS is a high-performance open-source DNS server. It
+implements only the authoritative domain name service. Knot DNS
+can reliably serve TLD domains as well as any other zones.</p>
+<p>Knot DNS benefits from its multi-threaded and mostly lock-free
+implementation which allows it to scale well on SMP systems and
+operate non-stop even when adding or removing zones.</p>
+<p>For more info and downloads see <a class="reference external" href="https://www.knot-dns.cz">www.knot-dns.cz</a>.</p>
+</div>
+<div class="section" id="knot-dns-features">
+<h2>Knot DNS features<a class="headerlink" href="#knot-dns-features" title="Permalink to this headline">¶</a></h2>
+<p>DNS features:</p>
+<ul class="simple">
+<li>Master and slave operation</li>
+<li>Internet class (IN)</li>
+<li>DNS extension (EDNS0)</li>
+<li>TCP and UDP protocols</li>
+<li>Dynamic zone updates</li>
+<li>DNSSEC with NSEC and NSEC3</li>
+<li>Transaction signature using TSIG</li>
+<li>Full and incremental zone transfers (AXFR, IXFR)</li>
+<li>Name server identification using NSID or Chaos TXT records</li>
+<li>Resource record types A, NS, CNAME, SOA, PTR, HINFO, MINFO, MX,
+TXT, RP, AFSDB, RT, KEY, AAAA, LOC, SRV, NAPTR, KX, CERT, DNAME, APL, DS,
+SSHFP, IPSECKEY, RRSIG, NSEC, DNSKEY, DHCID, NSEC3, NSEC3PARAM, TLSA, CDS,
+CDNSKEY, SPF, NID, L32, L64, LP, EUI48, EUI64, URI, CAA, and Unknown</li>
+</ul>
+<p>Server features:</p>
+<ul class="simple">
+<li>IPv4 and IPv6 support</li>
+<li>Semantic zone checks</li>
+<li>Server control interface</li>
+<li>Zone journal storage</li>
+<li>Persistent zone event timers</li>
+<li>YAML-based or database-based configuration</li>
+<li>Query processing modules with dynamic loading</li>
+<li>On-the-fly zone management and server reconfiguration</li>
+<li>Automatic DNSSEC signing with automatic key maganement and PKCS #11 interface</li>
+</ul>
+<p>Remarkable module extensions:</p>
+<ul class="simple">
+<li>Response rate limiting</li>
+<li>Forward and reverse records synthesis</li>
+<li>DNS request traffic statistics</li>
+<li>Dnstap traffic logging</li>
+<li>Online DNSSEC signing</li>
+<li>GeoIP response tailoring supporting ECS and DNSSEC</li>
+</ul>
+</div>
+<div class="section" id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<p>Knot DNS is licensed under the <a class="reference external" href="https://www.gnu.org/copyleft/gpl.html">GNU General Public License</a>
+version 3 or (at your option) any later version. The full text of the license
+is available in the <code class="docutils literal notranslate"><span class="pre">COPYING</span></code> file distributed with source code.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#what-is-knot-dns">What is Knot DNS</a></li>
+<li><a class="reference internal" href="#knot-dns-features">Knot DNS features</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Knot DNS’s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="requirements.html"
+                        title="next chapter">Requirements</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/introduction.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="requirements.html" title="Requirements"
+             >next</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Knot DNS’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

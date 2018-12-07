@@ -1,0 +1,300 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>keymgr – Key management utility &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="khost – Simple DNS lookup utility" href="man_khost.html" />
+    <link rel="prev" title="kdig – Advanced DNS lookup utility" href="man_kdig.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="man_khost.html" title="khost – Simple DNS lookup utility"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="man_kdig.html" title="kdig – Advanced DNS lookup utility"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="utilities.html" accesskey="U">Utilities</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="keymgr-key-management-utility">
+<h1>keymgr – Key management utility<a class="headerlink" href="#keymgr-key-management-utility" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><strong class="program">keymgr</strong> <em>basic_option</em> [<em>parameters</em>…]</p>
+<p><strong class="program">keymgr</strong> [<em>config_option</em> <em>config_storage</em>] <em>zone</em> <em>command</em> <em>argument</em>…</p>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>The <strong class="program">keymgr</strong> utility serves for manual key management in Knot DNS server.</p>
+<p>Functions for DNSSEC keys and KASP (Key And Signature Policy)
+management are provided.</p>
+<p>The DNSSEC and KASP configuration is stored in a so called KASP database.
+The database is backed by LMDB.</p>
+<div class="section" id="basic-options">
+<h3>Basic options<a class="headerlink" href="#basic-options" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>-h</strong>, <strong>–help</strong></dt>
+<dd>Print the program help.</dd>
+<dt><strong>-V</strong>, <strong>–version</strong></dt>
+<dd>Print the program version.</dd>
+<dt><strong>-t</strong>, <strong>–tsig</strong> <em>tsig_name</em> [<em>tsig_algorithm</em>] [<em>tsig_bits</em>]</dt>
+<dd>Generates a TSIG key. TSIG algorithm can be specified by string (default: hmac-sha256),
+bit length of the key by number (default: optimal length given by algorithm). The generated
+TSIG key is only displayed on <cite>stdout</cite>: the command does not create a file, nor include the
+key in a keystore.</dd>
+</dl>
+</div>
+<div class="section" id="config-options">
+<h3>Config options<a class="headerlink" href="#config-options" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>-c</strong>, <strong>–config</strong> <em>file</em></dt>
+<dd>Use a textual configuration file (default is <code class="file docutils literal notranslate"><span class="pre">&#64;config_dir&#64;/knot.conf</span></code>).</dd>
+<dt><strong>-C</strong>, <strong>–confdb</strong> <em>directory</em></dt>
+<dd>Use a binary configuration database directory (default is <code class="file docutils literal notranslate"><span class="pre">&#64;storage_dir&#64;/confdb</span></code>).
+The default configuration database, if exists, has a preference to the default
+configuration file.</dd>
+<dt><strong>-d</strong>, <strong>–dir</strong> <em>path</em></dt>
+<dd>Use specified KASP database path and default configuration.</dd>
+</dl>
+</div>
+<div class="section" id="commands">
+<h3>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>list</strong> [<em>timestamp_format</em>]</dt>
+<dd>Prints the list of key IDs and parameters of keys belonging to the zone.</dd>
+<dt><strong>generate</strong> [<em>arguments</em>…]</dt>
+<dd>Generates new DNSSEC key and stores it in KASP database. Prints the key ID.
+This action takes some number of arguments (see below). Values for unspecified arguments are taken
+from corresponding policy (if <em>-c</em> or <em>-C</em> options used) or from Knot policy defaults.</dd>
+<dt><strong>import-bind</strong> <em>BIND_key_file</em></dt>
+<dd>Imports a BIND-style key into KASP database (converting it to PEM format).
+Takes one argument: path to BIND key file (private or public, but both MUST exist).</dd>
+<dt><strong>import-pub</strong> <em>BIND_pubkey_file</em></dt>
+<dd>Imports a public key into KASP database. This key won’t be rollovered nor used for signing.
+Takes one argument: path to BIND public key file.</dd>
+<dt><strong>import-pem</strong> <em>PEM_file</em> [<em>arguments</em>…]</dt>
+<dd>Imports a DNSSEC key from PEM file. The key parameters (same as for the generate action) need to be
+specified (mainly algorithm, timers…) because they are not contained in the PEM format.</dd>
+<dt><strong>import-pkcs11</strong> <em>key_id</em> [<em>arguments</em>…]</dt>
+<dd>Imports a DNSSEC key from PKCS #11 storage. The key parameters (same as for the generate action) need to be
+specified (mainly algorithm, timers…) because they are not available. In fact, no key
+data is imported, only KASP database metadata is created.</dd>
+<dt><strong>set</strong> <em>key_spec</em> [<em>arguments</em>…]</dt>
+<dd>Changes a timing argument (or ksk/zsk) of an existing key to a new value. <em>Key_spec</em> is either the
+key tag or a prefix of the key ID; <em>arguments</em> are like for <strong>generate</strong>, but just the related ones.</dd>
+<dt><strong>ds</strong> [<em>key_spec</em>]</dt>
+<dd>Generate DS record (all digest algorithms together) for specified key. <em>Key_spec</em>
+is like for <strong>set</strong>, if unspecified, all KSKs are used.</dd>
+<dt><strong>dnskey</strong> [<em>key_spec</em>]</dt>
+<dd>Generate DNSKEY record for specified key. <em>Key_spec</em>
+is like for <strong>ds</strong>, if unspecified, all KSKs are used.</dd>
+<dt><strong>delete</strong> <em>key_spec</em></dt>
+<dd>Remove the specified key from zone. If the key was not shared, it is also deleted from keystore.</dd>
+<dt><strong>share</strong> <em>key_ID</em></dt>
+<dd>Import a key (specified by full key ID) from another zone as shared. After this, the key is
+owned by both zones equally.</dd>
+</dl>
+</div>
+<div class="section" id="generate-arguments">
+<h3>Generate arguments<a class="headerlink" href="#generate-arguments" title="Permalink to this headline">¶</a></h3>
+<p>Arguments are separated by space, each of them is in format ‘name=value’.</p>
+<dl class="docutils">
+<dt><strong>algorithm</strong></dt>
+<dd>Either an algorithm number (e.g. 14), or text name without dashes (e.g. ECDSAP384SHA384).</dd>
+<dt><strong>size</strong></dt>
+<dd>Key length in bits.</dd>
+<dt><strong>ksk</strong></dt>
+<dd>If set to <strong>yes</strong>, the key will be used for signing DNSKEY rrset. The generated key will also
+have the Secure Entry Point flag set to 1.</dd>
+<dt><strong>zsk</strong></dt>
+<dd>If set to <strong>yes</strong>, the key will be used for signing zone (except DNSKEY rrset). This flag can
+be set concurrently with the <strong>ksk</strong> flag.</dd>
+<dt><strong>sep</strong></dt>
+<dd>Overrides the standard setting of the Secure Entry Point flag for the generated key.</dd>
+</dl>
+<p>The following arguments are timestamps of key lifetime:</p>
+<dl class="docutils">
+<dt><strong>created</strong></dt>
+<dd>Key created.</dd>
+<dt><strong>pre_active</strong></dt>
+<dd>Key started to be used for signing, not published (only for algorithm rollover).</dd>
+<dt><strong>publish</strong></dt>
+<dd>Key published.</dd>
+<dt><strong>ready</strong></dt>
+<dd>Key used for signing and submitted to the parent zone (only for KSK).</dd>
+<dt><strong>active</strong></dt>
+<dd>Key used for signing.</dd>
+<dt><strong>post_active</strong></dt>
+<dd>Key still used for singing, but another key is active (only for KSK).</dd>
+<dt><strong>retire_active</strong></dt>
+<dd>Key no longer published, but still used for signing (only for algorithm rollover).</dd>
+<dt><strong>retire</strong></dt>
+<dd>Key still published, but no longer used for signing.</dd>
+<dt><strong>remove</strong></dt>
+<dd>Key deleted.</dd>
+</dl>
+</div>
+<div class="section" id="timestamps">
+<h3>Timestamps<a class="headerlink" href="#timestamps" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>0</dt>
+<dd>Zero timestamp means infinite future.</dd>
+<dt><em>UNIX_time</em></dt>
+<dd>Positive number of seconds since 1970 UTC.</dd>
+<dt><em>YYYYMMDDHHMMSS</em></dt>
+<dd>Date and time in this format without any punctuation.</dd>
+<dt><em>relative_timestamp</em></dt>
+<dd>A sign character (<strong>+</strong>, <strong>-</strong>), a number, and an optional time unit
+(<strong>y</strong>, <strong>mo</strong>, <strong>d</strong>, <strong>h</strong>, <strong>mi</strong>, <strong>s</strong>). The default unit is one second.
+E.g. +1mi, -2mo.</dd>
+</dl>
+</div>
+<div class="section" id="output-timestamp-formats">
+<h3>Output timestamp formats<a class="headerlink" href="#output-timestamp-formats" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>(none)</dt>
+<dd>The timestamps are printed as UNIX timestamp.</dd>
+<dt><strong>human</strong></dt>
+<dd>The timestamps are printed relatively to now using time units (e.g. -2y5mo, +1h13s).</dd>
+<dt><strong>iso</strong></dt>
+<dd>The timestamps are printed in the ISO8601 format (e.g. 2016-12-31T23:59:00).</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Generate new TSIG key:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> keymgr -t my_name hmac-sha384
+</pre></div>
+</div>
+</li>
+<li><p class="first">Generate new DNSSEC key:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> keymgr example.com. generate <span class="nv">algorithm</span><span class="o">=</span>ECDSAP256SHA256 <span class="nv">size</span><span class="o">=</span><span class="m">256</span> <span class="se">\</span>
+  <span class="nv">ksk</span><span class="o">=</span><span class="nb">true</span> <span class="nv">created</span><span class="o">=</span><span class="m">1488034625</span> <span class="nv">publish</span><span class="o">=</span><span class="m">20170223205611</span> <span class="nv">retire</span><span class="o">=</span>+10mo <span class="nv">remove</span><span class="o">=</span>+1y
+</pre></div>
+</div>
+</li>
+<li><p class="first">Import a DNSSEC key from BIND:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> keymgr example.com. import-bind ~/bind/Kharbinge4d5.+007+63089.key
+</pre></div>
+</div>
+</li>
+<li><p class="first">Configure key timing:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> keymgr example.com. <span class="nb">set</span> <span class="m">4208</span> <span class="nv">active</span><span class="o">=</span>+2mi <span class="nv">retire</span><span class="o">=</span>+4mi <span class="nv">remove</span><span class="o">=</span>+5mi
+</pre></div>
+</div>
+</li>
+<li><p class="first">Share a KSK from another zone:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> keymgr example.com. share e687cf927029e9db7184d2ece6d663f5d1e5b0e9
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<p><span class="target" id="index-0"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6781.html"><strong>RFC 6781</strong></a> - DNSSEC Operational Practices.
+<span class="target" id="index-1"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc7583.html"><strong>RFC 7583</strong></a> - DNSSEC Key Rollover Timing Considerations.</p>
+<p><em class="manpage">knot.conf(5)</em>,
+<em class="manpage">knotc(8)</em>,
+<em class="manpage">knotd(8)</em>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">keymgr – Key management utility</a><ul>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a><ul>
+<li><a class="reference internal" href="#basic-options">Basic options</a></li>
+<li><a class="reference internal" href="#config-options">Config options</a></li>
+<li><a class="reference internal" href="#commands">Commands</a></li>
+<li><a class="reference internal" href="#generate-arguments">Generate arguments</a></li>
+<li><a class="reference internal" href="#timestamps">Timestamps</a></li>
+<li><a class="reference internal" href="#output-timestamp-formats">Output timestamp formats</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="man_kdig.html"
+                        title="previous chapter">kdig – Advanced DNS lookup utility</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="man_khost.html"
+                        title="next chapter">khost – Simple DNS lookup utility</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/man_keymgr.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="man_khost.html" title="khost – Simple DNS lookup utility"
+             >next</a></li>
+        <li class="right" >
+          <a href="man_kdig.html" title="kdig – Advanced DNS lookup utility"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="utilities.html" >Utilities</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

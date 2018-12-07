@@ -1,0 +1,1323 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Configuration Reference &#8212; Knot DNS  documentation</title>
+    <link rel="stylesheet" href="_static/main.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Utilities" href="utilities.html" />
+    <link rel="prev" title="Troubleshooting" href="troubleshooting.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="utilities.html" title="Utilities"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="troubleshooting.html" title="Troubleshooting"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="configuration-reference">
+<span id="id1"></span><h1>Configuration Reference<a class="headerlink" href="#configuration-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="description">
+<span id="id2"></span><h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>Configuration files for Knot DNS use simplified YAML format. Simplified means
+that not all of the features are supported.</p>
+<p>For the description of configuration items, we have to declare a meaning of
+the following symbols:</p>
+<ul class="simple">
+<li><em>INT</em> – Integer</li>
+<li><em>STR</em> – Textual string</li>
+<li><em>HEXSTR</em> – Hexadecimal string (with <code class="docutils literal notranslate"><span class="pre">0x</span></code> prefix)</li>
+<li><em>BOOL</em> – Boolean value (<code class="docutils literal notranslate"><span class="pre">on</span></code>/<code class="docutils literal notranslate"><span class="pre">off</span></code> or <code class="docutils literal notranslate"><span class="pre">true</span></code>/<code class="docutils literal notranslate"><span class="pre">false</span></code>)</li>
+<li><em>TIME</em> – Number of seconds, an integer with possible time multiplier suffix
+(<code class="docutils literal notranslate"><span class="pre">s</span></code> ~ 1, <code class="docutils literal notranslate"><span class="pre">m</span></code> ~ 60, <code class="docutils literal notranslate"><span class="pre">h</span></code> ~ 3600 or <code class="docutils literal notranslate"><span class="pre">d</span></code> ~ 24 * 3600)</li>
+<li><em>SIZE</em> – Number of bytes, an integer with possible size multiplier suffix
+(<code class="docutils literal notranslate"><span class="pre">B</span></code> ~ 1, <code class="docutils literal notranslate"><span class="pre">K</span></code> ~ 1024, <code class="docutils literal notranslate"><span class="pre">M</span></code> ~ 1024^2 or <code class="docutils literal notranslate"><span class="pre">G</span></code> ~ 1024^3)</li>
+<li><em>BASE64</em> – Base64 encoded string</li>
+<li><em>ADDR</em> – IPv4 or IPv6 address</li>
+<li><em>DNAME</em> – Domain name</li>
+<li>… – Multi-valued item, order of the values is preserved</li>
+<li>[ ] – Optional value</li>
+<li>| – Choice</li>
+</ul>
+<p>There are 12 main sections (<code class="docutils literal notranslate"><span class="pre">module</span></code>, <code class="docutils literal notranslate"><span class="pre">server</span></code>, <code class="docutils literal notranslate"><span class="pre">control</span></code>, <code class="docutils literal notranslate"><span class="pre">log</span></code>,
+<code class="docutils literal notranslate"><span class="pre">statistics</span></code>, <code class="docutils literal notranslate"><span class="pre">keystore</span></code>, <code class="docutils literal notranslate"><span class="pre">policy</span></code>, <code class="docutils literal notranslate"><span class="pre">key</span></code>, <code class="docutils literal notranslate"><span class="pre">acl</span></code>, <code class="docutils literal notranslate"><span class="pre">remote</span></code>,
+<code class="docutils literal notranslate"><span class="pre">template</span></code>, and <code class="docutils literal notranslate"><span class="pre">zone</span></code>) and module sections with the <code class="docutils literal notranslate"><span class="pre">mod-</span></code> prefix.
+Most of the sections (excluding <code class="docutils literal notranslate"><span class="pre">server</span></code>, <code class="docutils literal notranslate"><span class="pre">control</span></code>, and <code class="docutils literal notranslate"><span class="pre">statistics</span></code>)
+are sequences of settings blocks. Each settings block begins with a unique identifier,
+which can be used as a reference from other sections (such identifier
+must be defined in advance).</p>
+<p>A multi-valued item can be specified either as a YAML sequence:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>address: [10.0.0.1, 10.0.0.2]
+</pre></div>
+</div>
+<p>or as more single-valued items each on an extra line:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>address: 10.0.0.1
+address: 10.0.0.2
+</pre></div>
+</div>
+<p>If an item value contains spaces or other special characters, it is necessary
+to enclose such value within double quotes <code class="docutils literal notranslate"><span class="pre">&quot;</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>.</p>
+</div>
+<div class="section" id="comments">
+<span id="id3"></span><h2>Comments<a class="headerlink" href="#comments" title="Permalink to this headline">¶</a></h2>
+<p>A comment begins with a <code class="docutils literal notranslate"><span class="pre">#</span></code> character and is ignored during processing.
+Also each configuration section or sequence block allows a permanent
+comment using the <code class="docutils literal notranslate"><span class="pre">comment</span></code> item which is stored in the server beside the
+configuration.</p>
+</div>
+<div class="section" id="includes">
+<span id="id4"></span><h2>Includes<a class="headerlink" href="#includes" title="Permalink to this headline">¶</a></h2>
+<p>Another configuration file or files, matching a pattern, can be included at
+the top level in the current file. If the path is not absolute, then it
+is considered to be relative to the current file. The pattern can be
+an arbitrary string meeting POSIX <em>glob</em> requirements, e.g. dir/*.conf.
+Matching files are processed in sorted order.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>include: STR
+</pre></div>
+</div>
+</div>
+<div class="section" id="module-section">
+<span id="id5"></span><h2>Module section<a class="headerlink" href="#module-section" title="Permalink to this headline">¶</a></h2>
+<p>Dynamic modules loading configuration.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If configured with non-empty <code class="docutils literal notranslate"><span class="pre">`--with-moduledir=path`</span></code> parameter, all
+shared modules in this directory will be automatically loaded.</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>module:
+  - id: STR
+    file: STR
+</pre></div>
+</div>
+<div class="section" id="module-id">
+<span id="id"></span><h3>id<a class="headerlink" href="#module-id" title="Permalink to this headline">¶</a></h3>
+<p>A module identifier in the form of the <code class="docutils literal notranslate"><span class="pre">mod-</span></code> prefix and module name suffix.</p>
+</div>
+<div class="section" id="file">
+<span id="module-file"></span><h3>file<a class="headerlink" href="#file" title="Permalink to this headline">¶</a></h3>
+<p>A path to a shared library file with the module implementation.</p>
+<p><em>Default:</em> <code class="docutils literal notranslate"><span class="pre">${libdir}/knot/modules-${version}</span></code>/module_name.so
+(or <code class="docutils literal notranslate"><span class="pre">${path}</span></code>/module_name.so if configured with <code class="docutils literal notranslate"><span class="pre">--with-moduledir=path</span></code>)</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If the path is not absolute, the library is searched in the set of
+system directories. See <code class="docutils literal notranslate"><span class="pre">man</span> <span class="pre">dlopen</span></code> for more details.</p>
+</div>
+</div>
+</div>
+<div class="section" id="server-section">
+<span id="id6"></span><h2>Server section<a class="headerlink" href="#server-section" title="Permalink to this headline">¶</a></h2>
+<p>General options related to the server.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>server:
+    identity: [STR]
+    version: [STR]
+    nsid: [STR|HEXSTR]
+    rundir: STR
+    user: STR[:STR]
+    pidfile: STR
+    udp-workers: INT
+    tcp-workers: INT
+    background-workers: INT
+    async-start: BOOL
+    tcp-handshake-timeout: TIME
+    tcp-idle-timeout: TIME
+    tcp-reply-timeout: TIME
+    max-tcp-clients: INT
+    max-udp-payload: SIZE
+    max-ipv4-udp-payload: SIZE
+    max-ipv6-udp-payload: SIZE
+    edns-client-subnet: BOOL
+    answer-rotation: BOOL
+    listen: ADDR[@INT] ...
+</pre></div>
+</div>
+<div class="section" id="server-identity">
+<span id="identity"></span><h3>identity<a class="headerlink" href="#server-identity" title="Permalink to this headline">¶</a></h3>
+<p>An identity of the server returned in the response to the query for TXT
+record <code class="docutils literal notranslate"><span class="pre">id.server.</span></code> or <code class="docutils literal notranslate"><span class="pre">hostname.bind.</span></code> in the CHAOS class (<span class="target" id="index-0"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4892.html"><strong>RFC 4892</strong></a>).
+Set empty value to disable.</p>
+<p><em>Default:</em> FQDN hostname</p>
+</div>
+<div class="section" id="version">
+<span id="server-version"></span><h3>version<a class="headerlink" href="#version" title="Permalink to this headline">¶</a></h3>
+<p>A version of the server software returned in the response to the query
+for TXT record <code class="docutils literal notranslate"><span class="pre">version.server.</span></code> or <code class="docutils literal notranslate"><span class="pre">version.bind.</span></code> in the CHAOS
+class (<span class="target" id="index-1"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4892.html"><strong>RFC 4892</strong></a>). Set empty value to disable.</p>
+<p><em>Default:</em> server version</p>
+</div>
+<div class="section" id="nsid">
+<span id="server-nsid"></span><h3>nsid<a class="headerlink" href="#nsid" title="Permalink to this headline">¶</a></h3>
+<p>A DNS name server identifier (<span class="target" id="index-2"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc5001.html"><strong>RFC 5001</strong></a>). Set empty value to disable.</p>
+<p><em>Default:</em> FQDN hostname</p>
+</div>
+<div class="section" id="rundir">
+<span id="server-rundir"></span><h3>rundir<a class="headerlink" href="#rundir" title="Permalink to this headline">¶</a></h3>
+<p>A path for storing run-time data (PID file, unix sockets, etc.).</p>
+<p><em>Default:</em> <code class="docutils literal notranslate"><span class="pre">${localstatedir}/run/knot</span></code> (configured with <code class="docutils literal notranslate"><span class="pre">--with-rundir=path</span></code>)</p>
+</div>
+<div class="section" id="user">
+<span id="server-user"></span><h3>user<a class="headerlink" href="#user" title="Permalink to this headline">¶</a></h3>
+<p>A system user with an optional system group (<code class="docutils literal notranslate"><span class="pre">user:group</span></code>) under which the
+server is run after starting and binding to interfaces. Linux capabilities
+are employed if supported.</p>
+<p><em>Default:</em> root:root</p>
+</div>
+<div class="section" id="pidfile">
+<span id="server-pidfile"></span><h3>pidfile<a class="headerlink" href="#pidfile" title="Permalink to this headline">¶</a></h3>
+<p>A PID file location.</p>
+<p><em>Default:</em> <a class="reference internal" href="#server-rundir"><span class="std std-ref">rundir</span></a>/knot.pid</p>
+</div>
+<div class="section" id="udp-workers">
+<span id="server-udp-workers"></span><h3>udp-workers<a class="headerlink" href="#udp-workers" title="Permalink to this headline">¶</a></h3>
+<p>A number of UDP workers (threads) used to process incoming queries
+over UDP.</p>
+<p><em>Default:</em> auto-estimated optimal value based on the number of online CPUs</p>
+</div>
+<div class="section" id="tcp-workers">
+<span id="server-tcp-workers"></span><h3>tcp-workers<a class="headerlink" href="#tcp-workers" title="Permalink to this headline">¶</a></h3>
+<p>A number of TCP workers (threads) used to process incoming queries
+over TCP.</p>
+<p><em>Default:</em> auto-estimated optimal value based on the number of online CPUs</p>
+</div>
+<div class="section" id="background-workers">
+<span id="server-background-workers"></span><h3>background-workers<a class="headerlink" href="#background-workers" title="Permalink to this headline">¶</a></h3>
+<p>A number of workers (threads) used to execute background operations (zone
+loading, zone updates, etc.).</p>
+<p><em>Default:</em> auto-estimated optimal value based on the number of online CPUs</p>
+</div>
+<div class="section" id="async-start">
+<span id="server-async-start"></span><h3>async-start<a class="headerlink" href="#async-start" title="Permalink to this headline">¶</a></h3>
+<p>If enabled, server doesn’t wait for the zones to be loaded and starts
+responding immediately with SERVFAIL answers until the zone loads.</p>
+<p><em>Default:</em> off</p>
+</div>
+<div class="section" id="tcp-handshake-timeout">
+<span id="server-tcp-handshake-timeout"></span><h3>tcp-handshake-timeout<a class="headerlink" href="#tcp-handshake-timeout" title="Permalink to this headline">¶</a></h3>
+<p>Maximum time between newly accepted TCP connection and the first query.
+This is useful to disconnect inactive connections faster than connections
+that already made at least 1 meaningful query.</p>
+<p><em>Default:</em> 5</p>
+</div>
+<div class="section" id="tcp-idle-timeout">
+<span id="server-tcp-idle-timeout"></span><h3>tcp-idle-timeout<a class="headerlink" href="#tcp-idle-timeout" title="Permalink to this headline">¶</a></h3>
+<p>Maximum idle time between requests on a TCP connection. This also limits
+receiving of a single query, each query must be received in this time limit.</p>
+<p><em>Default:</em> 20</p>
+</div>
+<div class="section" id="tcp-reply-timeout">
+<span id="server-tcp-reply-timeout"></span><h3>tcp-reply-timeout<a class="headerlink" href="#tcp-reply-timeout" title="Permalink to this headline">¶</a></h3>
+<p>Maximum time to wait for an outgoing connection or for a reply to an issued
+request (SOA, NOTIFY, AXFR…).</p>
+<p><em>Default:</em> 10</p>
+</div>
+<div class="section" id="max-tcp-clients">
+<span id="server-max-tcp-clients"></span><h3>max-tcp-clients<a class="headerlink" href="#max-tcp-clients" title="Permalink to this headline">¶</a></h3>
+<p>A maximum number of TCP clients connected in parallel, set this below the file
+descriptor limit to avoid resource exhaustion.</p>
+<p><em>Default:</em> 100</p>
+</div>
+<div class="section" id="max-udp-payload">
+<span id="server-max-udp-payload"></span><h3>max-udp-payload<a class="headerlink" href="#max-udp-payload" title="Permalink to this headline">¶</a></h3>
+<p>Maximum EDNS0 UDP payload size default for both IPv4 and IPv6.</p>
+<p><em>Default:</em> 4096</p>
+</div>
+<div class="section" id="max-ipv4-udp-payload">
+<span id="server-max-ipv4-udp-payload"></span><h3>max-ipv4-udp-payload<a class="headerlink" href="#max-ipv4-udp-payload" title="Permalink to this headline">¶</a></h3>
+<p>Maximum EDNS0 UDP payload size for IPv4.</p>
+<p><em>Default:</em> 4096</p>
+</div>
+<div class="section" id="max-ipv6-udp-payload">
+<span id="server-max-ipv6-udp-payload"></span><h3>max-ipv6-udp-payload<a class="headerlink" href="#max-ipv6-udp-payload" title="Permalink to this headline">¶</a></h3>
+<p>Maximum EDNS0 UDP payload size for IPv6.</p>
+<p><em>Default:</em> 4096</p>
+</div>
+<div class="section" id="edns-client-subnet">
+<span id="server-edns-client-subnet"></span><h3>edns-client-subnet<a class="headerlink" href="#edns-client-subnet" title="Permalink to this headline">¶</a></h3>
+<p>Enable or disable EDNS Client Subnet support. If enabled, responses to queries
+containing the EDNS Client Subnet option
+always contain a valid EDNS Client Subnet option according to <span class="target" id="index-3"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc7871.html"><strong>RFC 7871</strong></a>.</p>
+<p><em>Default:</em> off</p>
+</div>
+<div class="section" id="answer-rotation">
+<span id="server-answer-rotation"></span><h3>answer-rotation<a class="headerlink" href="#answer-rotation" title="Permalink to this headline">¶</a></h3>
+<p>Enable or disable sorted-rrset rotation in the answer section of normal replies.
+The rotation shift is simply determined by a query ID.</p>
+<p><em>Default:</em> off</p>
+</div>
+<div class="section" id="listen">
+<span id="server-listen"></span><h3>listen<a class="headerlink" href="#listen" title="Permalink to this headline">¶</a></h3>
+<p>One or more IP addresses where the server listens for incoming queries.
+Optional port specification (default is 53) can be appended to each address
+using <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> separator. Use <code class="docutils literal notranslate"><span class="pre">0.0.0.0</span></code> for all configured IPv4 addresses or
+<code class="docutils literal notranslate"><span class="pre">::</span></code> for all configured IPv6 addresses.</p>
+<p><em>Default:</em> not set</p>
+</div>
+</div>
+<div class="section" id="key-section">
+<span id="id7"></span><h2>Key section<a class="headerlink" href="#key-section" title="Permalink to this headline">¶</a></h2>
+<p>Shared TSIG keys used to authenticate communication with the server.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>key:
+  - id: DNAME
+    algorithm: hmac-md5 | hmac-sha1 | hmac-sha224 | hmac-sha256 | hmac-sha384 | hmac-sha512
+    secret: BASE64
+</pre></div>
+</div>
+<div class="section" id="key-id">
+<span id="id8"></span><h3>id<a class="headerlink" href="#key-id" title="Permalink to this headline">¶</a></h3>
+<p>A key name identifier.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This value MUST be exactly the same as the name of the TSIG key on the
+opposite master/slave server(s).</p>
+</div>
+</div>
+<div class="section" id="algorithm">
+<span id="key-algorithm"></span><h3>algorithm<a class="headerlink" href="#algorithm" title="Permalink to this headline">¶</a></h3>
+<p>A key algorithm.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="secret">
+<span id="key-secret"></span><h3>secret<a class="headerlink" href="#secret" title="Permalink to this headline">¶</a></h3>
+<p>Shared key secret.</p>
+<p><em>Default:</em> not set</p>
+</div>
+</div>
+<div class="section" id="acl-section">
+<span id="id9"></span><h2>ACL section<a class="headerlink" href="#acl-section" title="Permalink to this headline">¶</a></h2>
+<p>Access control list rule definitions. The ACLs are used to match incoming
+connections to allow or deny requested operation (zone transfer request, DDNS
+update, etc.).</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>acl:
+  - id: STR
+    address: ADDR[/INT] | ADDR-ADDR ...
+    key: key_id ...
+    action: notify | transfer | update ...
+    deny: BOOL
+</pre></div>
+</div>
+<div class="section" id="acl-id">
+<span id="id10"></span><h3>id<a class="headerlink" href="#acl-id" title="Permalink to this headline">¶</a></h3>
+<p>An ACL rule identifier.</p>
+</div>
+<div class="section" id="address">
+<span id="acl-address"></span><h3>address<a class="headerlink" href="#address" title="Permalink to this headline">¶</a></h3>
+<p>An ordered list of IP addresses, network subnets, or network ranges. The query
+must match one of them. Empty value means that address match is not required.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="key">
+<span id="acl-key"></span><h3>key<a class="headerlink" href="#key" title="Permalink to this headline">¶</a></h3>
+<p>An ordered list of <a class="reference internal" href="#key-id"><span class="std std-ref">reference</span></a>s to TSIG keys. The query must
+match one of them. Empty value means that transaction authentication is not used.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="action">
+<span id="acl-action"></span><h3>action<a class="headerlink" href="#action" title="Permalink to this headline">¶</a></h3>
+<p>An ordered list of allowed (or denied) actions.</p>
+<p>Possible values:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">transfer</span></code> – Allow zone transfer</li>
+<li><code class="docutils literal notranslate"><span class="pre">notify</span></code> – Allow incoming notify</li>
+<li><code class="docutils literal notranslate"><span class="pre">update</span></code> – Allow zone updates</li>
+</ul>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="deny">
+<span id="acl-deny"></span><h3>deny<a class="headerlink" href="#deny" title="Permalink to this headline">¶</a></h3>
+<p>If enabled, instead of allowing, deny the specified <a class="reference internal" href="#acl-action"><span class="std std-ref">action</span></a>,
+<a class="reference internal" href="#acl-address"><span class="std std-ref">address</span></a>, <a class="reference internal" href="#acl-key"><span class="std std-ref">key</span></a>, or combination if these
+items. If no action is specified, deny all actions.</p>
+<p><em>Default:</em> off</p>
+</div>
+</div>
+<div class="section" id="control-section">
+<span id="id11"></span><h2>Control section<a class="headerlink" href="#control-section" title="Permalink to this headline">¶</a></h2>
+<p>Configuration of the server control interface.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>control:
+    listen: STR
+    timeout: TIME
+</pre></div>
+</div>
+<div class="section" id="control-listen">
+<span id="id12"></span><h3>listen<a class="headerlink" href="#control-listen" title="Permalink to this headline">¶</a></h3>
+<p>A UNIX socket path where the server listens for control commands.</p>
+<p><em>Default:</em> <a class="reference internal" href="#server-rundir"><span class="std std-ref">rundir</span></a>/knot.sock</p>
+</div>
+<div class="section" id="timeout">
+<span id="control-timeout"></span><h3>timeout<a class="headerlink" href="#timeout" title="Permalink to this headline">¶</a></h3>
+<p>Maximum time the control socket operations can take. Set 0 for infinity.</p>
+<p><em>Default:</em> 5</p>
+</div>
+</div>
+<div class="section" id="statistics-section">
+<span id="id13"></span><h2>Statistics section<a class="headerlink" href="#statistics-section" title="Permalink to this headline">¶</a></h2>
+<p>Periodic server statistics dumping.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>statistics:
+    timer: TIME
+    file: STR
+    append: BOOL
+</pre></div>
+</div>
+<div class="section" id="timer">
+<span id="statistics-timer"></span><h3>timer<a class="headerlink" href="#timer" title="Permalink to this headline">¶</a></h3>
+<p>A period after which all available statistics metrics will by written to the
+<a class="reference internal" href="#statistics-file"><span class="std std-ref">file</span></a>.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="statistics-file">
+<span id="id14"></span><h3>file<a class="headerlink" href="#statistics-file" title="Permalink to this headline">¶</a></h3>
+<p>A file path of statistics output in the YAML format.</p>
+<p><em>Default:</em> <a class="reference internal" href="#server-rundir"><span class="std std-ref">rundir</span></a>/stats.yaml</p>
+</div>
+<div class="section" id="append">
+<span id="statistics-append"></span><h3>append<a class="headerlink" href="#append" title="Permalink to this headline">¶</a></h3>
+<p>If enabled, the output will be appended to the <a class="reference internal" href="#statistics-file"><span class="std std-ref">file</span></a>
+instead of file replacement.</p>
+<p><em>Default:</em> off</p>
+</div>
+</div>
+<div class="section" id="keystore-section">
+<span id="id15"></span><h2>Keystore section<a class="headerlink" href="#keystore-section" title="Permalink to this headline">¶</a></h2>
+<p>DNSSEC keystore configuration.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>keystore:
+  - id: STR
+    backend: pem | pkcs11
+    config: STR
+</pre></div>
+</div>
+<div class="section" id="keystore-id">
+<span id="id16"></span><h3>id<a class="headerlink" href="#keystore-id" title="Permalink to this headline">¶</a></h3>
+<p>A keystore identifier.</p>
+</div>
+<div class="section" id="backend">
+<span id="keystore-backend"></span><h3>backend<a class="headerlink" href="#backend" title="Permalink to this headline">¶</a></h3>
+<p>A key storage backend type. A directory with PEM files or a PKCS #11 storage.</p>
+<p><em>Default:</em> pem</p>
+</div>
+<div class="section" id="config">
+<span id="keystore-config"></span><h3>config<a class="headerlink" href="#config" title="Permalink to this headline">¶</a></h3>
+<p>A backend specific configuration. A directory with PEM files (the path can
+be specified as a relative path to <a class="reference internal" href="#template-kasp-db"><span class="std std-ref">kasp-db</span></a>) or
+a configuration string for PKCS #11 storage.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Example configuration string for PKCS #11:</p>
+<div class="last highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;pkcs11:token=knot;pin-value=1234 /usr/lib64/pkcs11/libsofthsm2.so&quot;
+</pre></div>
+</div>
+</div>
+<p><em>Default:</em> <a class="reference internal" href="#template-kasp-db"><span class="std std-ref">kasp-db</span></a>/keys</p>
+</div>
+</div>
+<div class="section" id="submission-section">
+<span id="id17"></span><h2>Submission section<a class="headerlink" href="#submission-section" title="Permalink to this headline">¶</a></h2>
+<p>Parameters of KSK submission checks.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>submission:
+  - id: STR
+    parent: remote_id ...
+    check-interval: TIME
+    timeout: TIME
+</pre></div>
+</div>
+<div class="section" id="submission-id">
+<span id="id18"></span><h3>id<a class="headerlink" href="#submission-id" title="Permalink to this headline">¶</a></h3>
+<p>A submission identifier.</p>
+</div>
+<div class="section" id="parent">
+<span id="submission-parent"></span><h3>parent<a class="headerlink" href="#parent" title="Permalink to this headline">¶</a></h3>
+<p>A list of <a class="reference internal" href="#remote-id"><span class="std std-ref">references</span></a> to parent’s DNS servers to be checked for
+presence of corresponding DS records in the case of KSK submission. All of them must
+have a corresponding DS for the rollover to continue. If none is specified, the
+rollover must be pushed forward manually.</p>
+<p><em>Default:</em> not set</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">A DNSSEC-validating resolver can be set as a parent.</p>
+</div>
+</div>
+<div class="section" id="check-interval">
+<span id="submission-check-interval"></span><h3>check-interval<a class="headerlink" href="#check-interval" title="Permalink to this headline">¶</a></h3>
+<p>Interval for periodic checks of DS presence on parent’s DNS servers, in the
+case of the KSK submission.</p>
+<p><em>Default:</em> 1 hour</p>
+</div>
+<div class="section" id="submission-timeout">
+<span id="id19"></span><h3>timeout<a class="headerlink" href="#submission-timeout" title="Permalink to this headline">¶</a></h3>
+<p>After this period, the KSK submission is automatically considered successful, even
+if all the checks were negative or no parents are configured. Set 0 for infinity.</p>
+<p><em>Default:</em> 0</p>
+</div>
+</div>
+<div class="section" id="policy-section">
+<span id="id20"></span><h2>Policy section<a class="headerlink" href="#policy-section" title="Permalink to this headline">¶</a></h2>
+<p>DNSSEC policy configuration.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>policy:
+  - id: STR
+    keystore: STR
+    manual: BOOL
+    single-type-signing: BOOL
+    algorithm: rsasha1 | rsasha1-nsec3-sha1 | rsasha256 | rsasha512 | ecdsap256sha256 | ecdsap384sha384 | ed25519
+    ksk-size: SIZE
+    zsk-size: SIZE
+    ksk-shared: BOOL
+    dnskey-ttl: TIME
+    zsk-lifetime: TIME
+    ksk-lifetime: TIME
+    propagation-delay: TIME
+    rrsig-lifetime: TIME
+    rrsig-refresh: TIME
+    nsec3: BOOL
+    nsec3-iterations: INT
+    nsec3-opt-out: BOOL
+    nsec3-salt-length: INT
+    nsec3-salt-lifetime: TIME
+    ksk-submission: submission_id
+    cds-cdnskey-publish: none | delete-dnssec | always
+</pre></div>
+</div>
+<div class="section" id="policy-id">
+<span id="id21"></span><h3>id<a class="headerlink" href="#policy-id" title="Permalink to this headline">¶</a></h3>
+<p>A policy identifier.</p>
+</div>
+<div class="section" id="keystore">
+<span id="policy-keystore"></span><h3>keystore<a class="headerlink" href="#keystore" title="Permalink to this headline">¶</a></h3>
+<p>A <a class="reference internal" href="#keystore-id"><span class="std std-ref">reference</span></a> to a keystore holding private key material
+for zones. A special <em>default</em> value can be used for the default keystore settings.</p>
+<p><em>Default:</em> default</p>
+</div>
+<div class="section" id="manual">
+<span id="policy-manual"></span><h3>manual<a class="headerlink" href="#manual" title="Permalink to this headline">¶</a></h3>
+<p>If enabled, automatic key management is not used.</p>
+<p><em>Default:</em> off</p>
+</div>
+<div class="section" id="single-type-signing">
+<span id="policy-single-type-signing"></span><h3>single-type-signing<a class="headerlink" href="#single-type-signing" title="Permalink to this headline">¶</a></h3>
+<p>If enabled, Single-Type Signing Scheme is used in the automatic key management
+mode.</p>
+<p><em>Default:</em> off</p>
+</div>
+<div class="section" id="policy-algorithm">
+<span id="id22"></span><h3>algorithm<a class="headerlink" href="#policy-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>An algorithm of signing keys and issued signatures.</p>
+<p><em>Default:</em> ecdsap256sha256</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Ed25519 algorithm is only available when compiled with GnuTLS 3.6.0+.</p>
+</div>
+</div>
+<div class="section" id="ksk-size">
+<span id="policy-ksk-size"></span><h3>ksk-size<a class="headerlink" href="#ksk-size" title="Permalink to this headline">¶</a></h3>
+<p>A length of newly generated <abbr title="Key Signing Key">KSK</abbr> or
+<abbr title="Combined Signing Key">CSK</abbr> keys.</p>
+<p><em>Default:</em> 2048 (rsa*), 256 (ecdsap256), 384 (ecdsap384), 256 (ed25519)</p>
+</div>
+<div class="section" id="zsk-size">
+<span id="policy-zsk-size"></span><h3>zsk-size<a class="headerlink" href="#zsk-size" title="Permalink to this headline">¶</a></h3>
+<p>A length of newly generated <abbr title="Zone Signing Key">ZSK</abbr> keys.</p>
+<p><em>Default:</em> see default for <a class="reference internal" href="#policy-ksk-size"><span class="std std-ref">ksk-size</span></a></p>
+</div>
+<div class="section" id="ksk-shared">
+<span id="policy-ksk-shared"></span><h3>ksk-shared<a class="headerlink" href="#ksk-shared" title="Permalink to this headline">¶</a></h3>
+<p>If enabled, all zones with this policy assigned will share one KSK.</p>
+<p><em>Default:</em> off</p>
+</div>
+<div class="section" id="dnskey-ttl">
+<h3>dnskey-ttl<a class="headerlink" href="#dnskey-ttl" title="Permalink to this headline">¶</a></h3>
+<p>A TTL value for DNSKEY records added into zone apex.</p>
+<p><em>Default:</em> zone SOA TTL</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">has infuence over ZSK key lifetime</p>
+</div>
+</div>
+<div class="section" id="zsk-lifetime">
+<span id="policy-zsk-lifetime"></span><h3>zsk-lifetime<a class="headerlink" href="#zsk-lifetime" title="Permalink to this headline">¶</a></h3>
+<p>A period between ZSK publication and the next rollover initiation.</p>
+<p><em>Default:</em> 30 days</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>ZSK key lifetime is also infuenced by propagation-delay and dnskey-ttl</p>
+<p class="last">Zero (aka infinity) value causes no ZSK rollover as a result.</p>
+</div>
+</div>
+<div class="section" id="ksk-lifetime">
+<span id="policy-ksk-lifetime"></span><h3>ksk-lifetime<a class="headerlink" href="#ksk-lifetime" title="Permalink to this headline">¶</a></h3>
+<p>A period between KSK publication and the next rollover initiation.</p>
+<p><em>Default:</em> 0</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>KSK key lifetime is also infuenced by propagation-delay, dnskey-ttl,
+and KSK submission delay.</p>
+<p>Zero (aka infinity) value causes no KSK rollover as a result.</p>
+<p class="last">This applies for CSK lifetime if single-type-signing is enabled.</p>
+</div>
+</div>
+<div class="section" id="propagation-delay">
+<span id="policy-propagation-delay"></span><h3>propagation-delay<a class="headerlink" href="#propagation-delay" title="Permalink to this headline">¶</a></h3>
+<p>An extra delay added for each key rollover step. This value should be high
+enough to cover propagation of data from the master server to all slaves.</p>
+<p><em>Default:</em> 1 day</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">has infuence over ZSK key lifetime</p>
+</div>
+</div>
+<div class="section" id="rrsig-lifetime">
+<span id="policy-rrsig-lifetime"></span><h3>rrsig-lifetime<a class="headerlink" href="#rrsig-lifetime" title="Permalink to this headline">¶</a></h3>
+<p>A validity period of newly issued signatures.</p>
+<p><em>Default:</em> 14 days</p>
+</div>
+<div class="section" id="rrsig-refresh">
+<span id="policy-rrsig-refresh"></span><h3>rrsig-refresh<a class="headerlink" href="#rrsig-refresh" title="Permalink to this headline">¶</a></h3>
+<p>A period how long before a signature expiration the signature will be refreshed.</p>
+<p><em>Default:</em> 7 days</p>
+</div>
+<div class="section" id="nsec3">
+<span id="policy-nsec"></span><h3>nsec3<a class="headerlink" href="#nsec3" title="Permalink to this headline">¶</a></h3>
+<p>Specifies if NSEC3 will be used instead of NSEC.</p>
+<p><em>Default:</em> off</p>
+</div>
+<div class="section" id="nsec3-iterations">
+<span id="policy-nsec3-iterations"></span><h3>nsec3-iterations<a class="headerlink" href="#nsec3-iterations" title="Permalink to this headline">¶</a></h3>
+<p>A number of additional times the hashing is performed.</p>
+<p><em>Default:</em> 5</p>
+</div>
+<div class="section" id="nsec3-opt-out">
+<span id="policy-nsec3-opt-out"></span><h3>nsec3-opt-out<a class="headerlink" href="#nsec3-opt-out" title="Permalink to this headline">¶</a></h3>
+<p>If set, NSEC3 records won’t be created for insecure delegations.
+This speeds up the zone signing and reduces overall zone size.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">NSEC3 with the Opt-Out bit set no longer works as a proof of non-existence
+in this zone.</p>
+</div>
+<p><em>Default:</em> off</p>
+</div>
+<div class="section" id="nsec3-salt-length">
+<span id="policy-nsec3-salt-length"></span><h3>nsec3-salt-length<a class="headerlink" href="#nsec3-salt-length" title="Permalink to this headline">¶</a></h3>
+<p>A length of a salt field in octets, which is appended to the original owner
+name before hashing.</p>
+<p><em>Default:</em> 8</p>
+</div>
+<div class="section" id="nsec3-salt-lifetime">
+<span id="policy-nsec3-salt-lifetime"></span><h3>nsec3-salt-lifetime<a class="headerlink" href="#nsec3-salt-lifetime" title="Permalink to this headline">¶</a></h3>
+<p>A validity period of newly issued salt field.</p>
+<p><em>Default:</em> 30 days</p>
+</div>
+<div class="section" id="ksk-submission">
+<span id="policy-ksk-submission-check"></span><h3>ksk-submission<a class="headerlink" href="#ksk-submission" title="Permalink to this headline">¶</a></h3>
+<p>A reference to <a class="reference internal" href="#submission-id"><span class="std std-ref">submission</span></a> section holding parameters of
+KSK submittion checks.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="cds-cdnskey-publish">
+<span id="policy-cds-cdnskey-publish"></span><h3>cds-cdnskey-publish<a class="headerlink" href="#cds-cdnskey-publish" title="Permalink to this headline">¶</a></h3>
+<p>Controls if and how shall the CDS and CDNSKEY be published in the zone.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This only applies if the zone keys are automatically managed by the server.</p>
+</div>
+<p>Possible values:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">none</span></code> - never publish any CDS or CDNSKEY records in the zone</li>
+<li><code class="docutils literal notranslate"><span class="pre">delete-dnssec</span></code> - publish special CDS and CDNSKEY records indicating turning off DNSSEC</li>
+<li><code class="docutils literal notranslate"><span class="pre">always</span></code> - always publish CDS and CDNSKEY records for the current KSK</li>
+</ul>
+<p><em>Default:</em> always</p>
+</div>
+</div>
+<div class="section" id="remote-section">
+<span id="id23"></span><h2>Remote section<a class="headerlink" href="#remote-section" title="Permalink to this headline">¶</a></h2>
+<p>Definitions of remote servers for outgoing connections (source of a zone
+transfer, target for a notification, etc.).</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>remote:
+  - id: STR
+    address: ADDR[@INT] ...
+    via: ADDR[@INT] ...
+    key: key_id
+</pre></div>
+</div>
+<div class="section" id="remote-id">
+<span id="id24"></span><h3>id<a class="headerlink" href="#remote-id" title="Permalink to this headline">¶</a></h3>
+<p>A remote identifier.</p>
+</div>
+<div class="section" id="remote-address">
+<span id="id25"></span><h3>address<a class="headerlink" href="#remote-address" title="Permalink to this headline">¶</a></h3>
+<p>An ordered list of destination IP addresses which are used for communication
+with the remote server. The addresses are tried in sequence unless the
+operation is successful. Optional destination port (default is 53)
+can be appended to the address using <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> separator.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="via">
+<span id="remote-via"></span><h3>via<a class="headerlink" href="#via" title="Permalink to this headline">¶</a></h3>
+<p>An ordered list of source IP addresses. The first address with the same family
+as the destination address is used. Optional source port (default is random)
+can be appended to the address using <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> separator.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="remote-key">
+<span id="id26"></span><h3>key<a class="headerlink" href="#remote-key" title="Permalink to this headline">¶</a></h3>
+<p>A <a class="reference internal" href="#key-id"><span class="std std-ref">reference</span></a> to the TSIG key which is used to authenticate
+the communication with the remote server.</p>
+<p><em>Default:</em> not set</p>
+</div>
+</div>
+<div class="section" id="template-section">
+<span id="id27"></span><h2>Template section<a class="headerlink" href="#template-section" title="Permalink to this headline">¶</a></h2>
+<p>A template is a shareable zone setting which can be used for configuration of
+many zones in one place. A special default template (with the <em>default</em> identifier)
+can be used for global querying configuration or as an implicit configuration
+if a zone doesn’t have another template specified.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>template:
+  - id: STR
+    timer-db: STR
+    max-timer-db-size: SIZE
+    journal-db: STR
+    journal-db-mode: robust | asynchronous
+    max-journal-db-size: SIZE
+    kasp-db: STR
+    max-kasp-db-size: SIZE
+    global-module: STR/STR ...
+    # All zone options (excluding &#39;template&#39; item)
+</pre></div>
+</div>
+<div class="section" id="template-id">
+<span id="id28"></span><h3>id<a class="headerlink" href="#template-id" title="Permalink to this headline">¶</a></h3>
+<p>A template identifier.</p>
+</div>
+<div class="section" id="timer-db">
+<span id="template-timer-db"></span><h3>timer-db<a class="headerlink" href="#timer-db" title="Permalink to this headline">¶</a></h3>
+<p>Specifies a path of the persistent timer database. The path can be specified
+as a relative path to the <em>default</em> template <a class="reference internal" href="#zone-storage"><span class="std std-ref">storage</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This option is only available in the <em>default</em> template.</p>
+</div>
+<p><em>Default:</em> <a class="reference internal" href="#zone-storage"><span class="std std-ref">storage</span></a>/timers</p>
+</div>
+<div class="section" id="max-timer-db-size">
+<span id="template-max-timer-db-size"></span><h3>max-timer-db-size<a class="headerlink" href="#max-timer-db-size" title="Permalink to this headline">¶</a></h3>
+<p>Hard limit for the timer database maximum size.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This option is only available in the <em>default</em> template.</p>
+</div>
+<p><em>Default:</em> 100 MiB</p>
+</div>
+<div class="section" id="journal-db">
+<span id="template-journal-db"></span><h3>journal-db<a class="headerlink" href="#journal-db" title="Permalink to this headline">¶</a></h3>
+<p>Specifies a path of the persistent journal database. The path can be specified
+as a relative path to the <em>default</em> template <a class="reference internal" href="#zone-storage"><span class="std std-ref">storage</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This option is only available in the <em>default</em> template.</p>
+</div>
+<p><em>Default:</em> <a class="reference internal" href="#zone-storage"><span class="std std-ref">storage</span></a>/journal</p>
+</div>
+<div class="section" id="journal-db-mode">
+<span id="template-journal-db-mode"></span><h3>journal-db-mode<a class="headerlink" href="#journal-db-mode" title="Permalink to this headline">¶</a></h3>
+<p>Specifies journal LMDB backend configuration, which influences performance
+and durability.</p>
+<p>Possible values:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">robust</span></code> – The journal DB disk sychronization ensures DB durability but is
+generally slower</li>
+<li><code class="docutils literal notranslate"><span class="pre">asynchronous</span></code> – The journal DB disk synchronization is optimized for
+better performance at the expense of lower DB durability; this mode is
+recommended only on slave nodes with many zones</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This option is only available in the <em>default</em> template.</p>
+</div>
+<p><em>Default:</em> robust</p>
+</div>
+<div class="section" id="max-journal-db-size">
+<span id="template-max-journal-db-size"></span><h3>max-journal-db-size<a class="headerlink" href="#max-journal-db-size" title="Permalink to this headline">¶</a></h3>
+<p>Hard limit for the common journal DB. There is no cleanup logic in journal
+to recover from reaching this limit: journal simply starts refusing changes
+across all zones. Decreasing this value has no effect if lower than actual
+DB file size.</p>
+<p>It is recommended to limit <a class="reference internal" href="#zone-max-journal-usage"><span class="std std-ref">max-journal-usage</span></a>
+per-zone instead of max-journal-size in most cases. Please keep this value
+larger than the sum of all zones’ journal usage limits. See more details
+regarding <a class="reference internal" href="operation.html#journal-behaviour"><span class="std std-ref">journal behaviour</span></a>.</p>
+<p>This value also influences server’s usage of virtual memory.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This option is only available in the <em>default</em> template.</p>
+</div>
+<p><em>Default:</em> 20 GiB (1 GiB for 32-bit)</p>
+</div>
+<div class="section" id="kasp-db">
+<span id="template-kasp-db"></span><h3>kasp-db<a class="headerlink" href="#kasp-db" title="Permalink to this headline">¶</a></h3>
+<p>A KASP database path. Non-absolute path is relative to
+<a class="reference internal" href="#zone-storage"><span class="std std-ref">storage</span></a>.</p>
+<p><em>Default:</em> <a class="reference internal" href="#zone-storage"><span class="std std-ref">storage</span></a>/keys</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This option is only available in the <em>default</em> template.</p>
+</div>
+</div>
+<div class="section" id="max-kasp-db-size">
+<span id="template-max-kasp-db-size"></span><h3>max-kasp-db-size<a class="headerlink" href="#max-kasp-db-size" title="Permalink to this headline">¶</a></h3>
+<p>Hard limit for the KASP database maximum size.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This option is only available in the <em>default</em> template.</p>
+</div>
+<p><em>Default:</em> 500 MiB</p>
+</div>
+<div class="section" id="global-module">
+<span id="template-global-module"></span><h3>global-module<a class="headerlink" href="#global-module" title="Permalink to this headline">¶</a></h3>
+<p>An ordered list of references to query modules in the form of <em>module_name</em> or
+<em>module_name/module_id</em>. These modules apply to all queries.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This option is only available in the <em>default</em> template.</p>
+</div>
+<p><em>Default:</em> not set</p>
+</div>
+</div>
+<div class="section" id="zone-section">
+<span id="id29"></span><h2>Zone section<a class="headerlink" href="#zone-section" title="Permalink to this headline">¶</a></h2>
+<p>Definition of zones served by the server.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>zone:
+  - domain: DNAME
+    template: template_id
+    storage: STR
+    file: STR
+    master: remote_id ...
+    ddns-master: remote_id
+    notify: remote_id ...
+    acl: acl_id ...
+    semantic-checks: BOOL
+    disable-any: BOOL
+    zonefile-sync: TIME
+    zonefile-load: none | difference | difference-no-serial | whole
+    journal-content: none | changes | all
+    max-journal-usage: SIZE
+    max-journal-depth: INT
+    max-zone-size : SIZE
+    dnssec-signing: BOOL
+    dnssec-policy: STR
+    request-edns-option: INT:[HEXSTR]
+    serial-policy: increment | unixtime | dateserial
+    min-refresh-interval: TIME
+    max-refresh-interval: TIME
+    module: STR/STR ...
+</pre></div>
+</div>
+<div class="section" id="domain">
+<span id="zone-domain"></span><h3>domain<a class="headerlink" href="#domain" title="Permalink to this headline">¶</a></h3>
+<p>A zone name identifier.</p>
+</div>
+<div class="section" id="template">
+<span id="zone-template"></span><h3>template<a class="headerlink" href="#template" title="Permalink to this headline">¶</a></h3>
+<p>A <a class="reference internal" href="#template-id"><span class="std std-ref">reference</span></a> to a configuration template.</p>
+<p><em>Default:</em> not set or <em>default</em> (if the template exists)</p>
+</div>
+<div class="section" id="storage">
+<span id="zone-storage"></span><h3>storage<a class="headerlink" href="#storage" title="Permalink to this headline">¶</a></h3>
+<p>A data directory for storing zone files, journal database, and timers database.</p>
+<p><em>Default:</em> <code class="docutils literal notranslate"><span class="pre">${localstatedir}/lib/knot</span></code> (configured with <code class="docutils literal notranslate"><span class="pre">--with-storage=path</span></code>)</p>
+</div>
+<div class="section" id="zone-file">
+<span id="id30"></span><h3>file<a class="headerlink" href="#zone-file" title="Permalink to this headline">¶</a></h3>
+<p>A path to the zone file. Non-absolute path is relative to
+<a class="reference internal" href="#zone-storage"><span class="std std-ref">storage</span></a>. It is also possible to use the following formatters:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">%c[</span></code><em>N</em><code class="docutils literal notranslate"><span class="pre">]</span></code> or <code class="docutils literal notranslate"><span class="pre">%c[</span></code><em>N</em><code class="docutils literal notranslate"><span class="pre">-</span></code><em>M</em><code class="docutils literal notranslate"><span class="pre">]</span></code> – means the <em>N</em>th
+character or a sequence of characters beginning from the <em>N</em>th and ending
+with the <em>M</em>th character of the textual zone name (see <code class="docutils literal notranslate"><span class="pre">%s</span></code>). The
+indexes are counted from 0 from the left. All dots (including the terminal
+one) are considered. If the character is not available, the formatter has no effect.</li>
+<li><code class="docutils literal notranslate"><span class="pre">%l[</span></code><em>N</em><code class="docutils literal notranslate"><span class="pre">]</span></code> – means the <em>N</em>th label of the textual zone name
+(see <code class="docutils literal notranslate"><span class="pre">%s</span></code>). The index is counted from 0 from the right (0 ~ TLD).
+If the label is not available, the formatter has no effect.</li>
+<li><code class="docutils literal notranslate"><span class="pre">%s</span></code> – means the current zone name in the textual representation.
+The zone name doesn’t include the terminating dot (the result for the root
+zone is the empty string!).</li>
+<li><code class="docutils literal notranslate"><span class="pre">%%</span></code> – means the <code class="docutils literal notranslate"><span class="pre">%</span></code> character</li>
+</ul>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Beware of special characters which are escaped or encoded in the \DDD form
+where DDD is corresponding decimal ASCII code.</p>
+</div>
+<p><em>Default:</em> <a class="reference internal" href="#zone-storage"><span class="std std-ref">storage</span></a>/<code class="docutils literal notranslate"><span class="pre">%s</span></code>.zone</p>
+</div>
+<div class="section" id="master">
+<span id="zone-master"></span><h3>master<a class="headerlink" href="#master" title="Permalink to this headline">¶</a></h3>
+<p>An ordered list of <a class="reference internal" href="#remote-id"><span class="std std-ref">references</span></a> to zone master servers.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="ddns-master">
+<span id="zone-ddns-master"></span><h3>ddns-master<a class="headerlink" href="#ddns-master" title="Permalink to this headline">¶</a></h3>
+<p>A <a class="reference internal" href="#remote-id"><span class="std std-ref">reference</span></a> to zone primary master server.
+If not specified, the first <a class="reference internal" href="#zone-master"><span class="std std-ref">master</span></a> server is used.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="notify">
+<span id="zone-notify"></span><h3>notify<a class="headerlink" href="#notify" title="Permalink to this headline">¶</a></h3>
+<p>An ordered list of <a class="reference internal" href="#remote-id"><span class="std std-ref">references</span></a> to remotes to which notify
+message is sent if the zone changes.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="acl">
+<span id="zone-acl"></span><h3>acl<a class="headerlink" href="#acl" title="Permalink to this headline">¶</a></h3>
+<p>An ordered list of <a class="reference internal" href="#acl-id"><span class="std std-ref">references</span></a> to ACL rules which can allow
+or disallow zone transfers, updates or incoming notifies.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="semantic-checks">
+<span id="zone-semantic-checks"></span><h3>semantic-checks<a class="headerlink" href="#semantic-checks" title="Permalink to this headline">¶</a></h3>
+<p>If enabled, extra zone file semantic checks are turned on.</p>
+<p>Several checks are enabled by default and cannot be turned off. An error in
+mandatory checks causes zone not to be loaded. An error in extra checks is
+logged only.</p>
+<p>Mandatory checks:</p>
+<ul class="simple">
+<li>SOA record missing in the zone (<span class="target" id="index-4"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1034.html"><strong>RFC 1034</strong></a>)</li>
+<li>An extra record together with CNAME record except for RRSIG and DS (<span class="target" id="index-5"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1034.html"><strong>RFC 1034</strong></a>)</li>
+<li>Multiple CNAME record with the same owner</li>
+<li>DNAME record having a record under it (<span class="target" id="index-6"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2672.html"><strong>RFC 2672</strong></a>)</li>
+</ul>
+<p>Extra checks:</p>
+<ul class="simple">
+<li>Missing NS record at the zone apex</li>
+<li>Missing glue A or AAAA record</li>
+<li>Invalid DNSKEY, DS, or NSEC3PARAM record</li>
+<li>CDS or CDNSKEY inconsistency</li>
+<li>Missing, invalid, or unverifiable RRSIG record</li>
+<li>Invalid NSEC(3) record</li>
+<li>Broken or non-cyclic NSEC(3) chain</li>
+</ul>
+<p><em>Default:</em> off</p>
+</div>
+<div class="section" id="disable-any">
+<span id="zone-disable-any"></span><h3>disable-any<a class="headerlink" href="#disable-any" title="Permalink to this headline">¶</a></h3>
+<p>If enabled, all authoritative ANY queries sent over UDP will be answered
+with an empty response and with the TC bit set. Use this option to minimize
+the risk of DNS reflection attack.</p>
+<p><em>Default:</em> off</p>
+</div>
+<div class="section" id="zonefile-sync">
+<span id="zone-zonefile-sync"></span><h3>zonefile-sync<a class="headerlink" href="#zonefile-sync" title="Permalink to this headline">¶</a></h3>
+<p>The time after which the current zone in memory will be synced with a zone file
+on the disk (see <a class="reference internal" href="#zone-file"><span class="std std-ref">file</span></a>). The server will serve the latest
+zone even after a restart using zone journal, but the zone file on the disk will
+only be synced after <code class="docutils literal notranslate"><span class="pre">zonefile-sync</span></code> time has expired (or after manual zone
+flush). This is applicable when the zone is updated via IXFR, DDNS or automatic
+DNSSEC signing. In order to completely disable automatic zone file synchronization,
+set the value to -1. In that case, it is still possible to force a manual zone flush
+using the <code class="docutils literal notranslate"><span class="pre">-f</span></code> option.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you are serving large zones with frequent updates where
+the immediate sync with a zone file is not desirable, increase the value.</p>
+</div>
+<p><em>Default:</em> 0 (immediate)</p>
+</div>
+<div class="section" id="zonefile-load">
+<span id="zone-zonefile-load"></span><h3>zonefile-load<a class="headerlink" href="#zonefile-load" title="Permalink to this headline">¶</a></h3>
+<p>Selects how the zone file contents are applied during zone load.</p>
+<p>Possible values:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">none</span></code> – The zone file is not used at all.</li>
+<li><code class="docutils literal notranslate"><span class="pre">difference</span></code> – If the zone contents are already available during server start or reload,
+the difference is computed between them and the contents of the zone file. This difference is then checked for semantic errors and
+applied to the current zone contents.</li>
+<li><code class="docutils literal notranslate"><span class="pre">difference-no-serial</span></code> – Same as <code class="docutils literal notranslate"><span class="pre">difference</span></code>, but the SOA serial in the zone file is
+ignored, the server takes care of incrementing the serial automatically.</li>
+<li><code class="docutils literal notranslate"><span class="pre">whole</span></code> – Zone contents are loaded from the zone file.</li>
+</ul>
+<p>When <code class="docutils literal notranslate"><span class="pre">difference</span></code> is configured and there are no zone contents yet (cold start of Knot
+and no zone contents in journal), it behaves the same way like <code class="docutils literal notranslate"><span class="pre">whole</span></code>.</p>
+<p><em>Default:</em> whole</p>
+</div>
+<div class="section" id="journal-content">
+<span id="zone-journal-content"></span><h3>journal-content<a class="headerlink" href="#journal-content" title="Permalink to this headline">¶</a></h3>
+<p>Selects how the journal shall be used to store zone and its changes.</p>
+<p>Possible values:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">none</span></code> – The journal is not used at all.</li>
+<li><code class="docutils literal notranslate"><span class="pre">changes</span></code> – Zone changes history is stored in journal.</li>
+<li><code class="docutils literal notranslate"><span class="pre">all</span></code> – Zone contents and history is stored in journal.</li>
+</ul>
+<p><em>Default:</em> changes</p>
+</div>
+<div class="section" id="max-journal-usage">
+<span id="zone-max-journal-usage"></span><h3>max-journal-usage<a class="headerlink" href="#max-journal-usage" title="Permalink to this headline">¶</a></h3>
+<p>Policy how much space in journal DB will the zone’s journal occupy.</p>
+<p><em>Default:</em> 100 MiB</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Journal DB may grow far above the sum of max-journal-usage across
+all zones, because of DB free space fragmentation.</p>
+</div>
+</div>
+<div class="section" id="max-journal-depth">
+<span id="zone-max-journal-depth"></span><h3>max-journal-depth<a class="headerlink" href="#max-journal-depth" title="Permalink to this headline">¶</a></h3>
+<p>Maximum history length of journal.</p>
+<p><em>Minimum:</em> 2</p>
+<p><em>Default:</em> 2^64</p>
+</div>
+<div class="section" id="max-zone-size">
+<span id="zone-max-zone-size"></span><h3>max-zone-size<a class="headerlink" href="#max-zone-size" title="Permalink to this headline">¶</a></h3>
+<p>Maximum size of the zone. The size is measured as size of the zone records
+in wire format without compression. The limit is enforced for incoming zone
+transfers and dynamic updates.</p>
+<p>For incremental transfers (IXFR), the effective limit for the total size of
+the records in the transfer is twice the configured value. However the final
+size of the zone must satisfy the configured value.</p>
+<p><em>Default:</em> 2^64</p>
+</div>
+<div class="section" id="dnssec-signing">
+<span id="zone-dnssec-signing"></span><h3>dnssec-signing<a class="headerlink" href="#dnssec-signing" title="Permalink to this headline">¶</a></h3>
+<p>If enabled, automatic DNSSEC signing for the zone is turned on.</p>
+<p><em>Default:</em> off</p>
+</div>
+<div class="section" id="dnssec-policy">
+<span id="zone-dnssec-policy"></span><h3>dnssec-policy<a class="headerlink" href="#dnssec-policy" title="Permalink to this headline">¶</a></h3>
+<p>A <a class="reference internal" href="#policy-id"><span class="std std-ref">reference</span></a> to DNSSEC signing policy. A special <em>default</em>
+value can be used for the default policy settings.</p>
+<p><em>Required</em></p>
+</div>
+<div class="section" id="request-edns-option">
+<span id="zone-request-edns-option"></span><h3>request-edns-option<a class="headerlink" href="#request-edns-option" title="Permalink to this headline">¶</a></h3>
+<p>An arbitrary EDNS0 option which is included into a server request (AXFR, IXFR,
+SOA, or NOTIFY). The value is in the option_code:option_data format.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="serial-policy">
+<span id="zone-serial-policy"></span><h3>serial-policy<a class="headerlink" href="#serial-policy" title="Permalink to this headline">¶</a></h3>
+<p>Specifies how the zone serial is updated after a dynamic update or
+automatic DNSSEC signing. If the serial is changed by the dynamic update,
+no change is made.</p>
+<p>Possible values:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">increment</span></code> – The serial is incremented according to serial number arithmetic</li>
+<li><code class="docutils literal notranslate"><span class="pre">unixtime</span></code> – The serial is set to the current unix time</li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">dateserial</span></code> – The 10-digit serial (YYYYMMDDnn) is incremented, the first</dt>
+<dd>8 digits match the current iso-date</dd>
+</dl>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>In case of <code class="docutils literal notranslate"><span class="pre">unixtime</span></code>, if the resulting serial is lower or equal than current zone
+(this happens e.g. in case of migrating from other policy or frequent updates)
+the serial is incremented instead.</p>
+<p class="last">Use dateserial only if you expect less than 100 updates per day per zone.</p>
+</div>
+<p><em>Default:</em> increment</p>
+</div>
+<div class="section" id="min-refresh-interval">
+<span id="zone-min-refresh-interval"></span><h3>min-refresh-interval<a class="headerlink" href="#min-refresh-interval" title="Permalink to this headline">¶</a></h3>
+<p>Forced minimum zone refresh interval to avoid flooding master.</p>
+<p><em>Default:</em> 2</p>
+</div>
+<div class="section" id="max-refresh-interval">
+<span id="zone-max-refresh-interval"></span><h3>max-refresh-interval<a class="headerlink" href="#max-refresh-interval" title="Permalink to this headline">¶</a></h3>
+<p>Forced maximum zone refresh interval.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="module">
+<span id="zone-module"></span><h3>module<a class="headerlink" href="#module" title="Permalink to this headline">¶</a></h3>
+<p>An ordered list of references to query modules in the form of <em>module_name</em> or
+<em>module_name/module_id</em>. These modules apply only to the current zone queries.</p>
+<p><em>Default:</em> not set</p>
+</div>
+</div>
+<div class="section" id="logging-section">
+<span id="id31"></span><h2>Logging section<a class="headerlink" href="#logging-section" title="Permalink to this headline">¶</a></h2>
+<p>Server can be configured to log to the standard output, standard error
+output, syslog (or systemd journal if systemd is enabled) or into an arbitrary
+file.</p>
+<p>There are 6 logging severity levels:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">critical</span></code> – Non-recoverable error resulting in server shutdown</li>
+<li><code class="docutils literal notranslate"><span class="pre">error</span></code> – Recoverable error, action should be taken</li>
+<li><code class="docutils literal notranslate"><span class="pre">warning</span></code> – Warning that might require user action</li>
+<li><code class="docutils literal notranslate"><span class="pre">notice</span></code> – Server notice or hint</li>
+<li><code class="docutils literal notranslate"><span class="pre">info</span></code> – Informational message</li>
+<li><code class="docutils literal notranslate"><span class="pre">debug</span></code> – Debug messages (must be turned on at compile time)</li>
+</ul>
+<p>In the case of missing log section, <code class="docutils literal notranslate"><span class="pre">warning</span></code> or more serious messages
+will be logged to both standard error output and syslog. The <code class="docutils literal notranslate"><span class="pre">info</span></code> and
+<code class="docutils literal notranslate"><span class="pre">notice</span></code> messages will be logged to standard output.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>log:
+  - target: stdout | stderr | syslog | STR
+    server: critical | error | warning | notice | info | debug
+    control: critical | error | warning | notice | info | debug
+    zone: critical | error | warning | notice | info | debug
+    any: critical | error | warning | notice | info | debug
+</pre></div>
+</div>
+<div class="section" id="target">
+<span id="log-target"></span><h3>target<a class="headerlink" href="#target" title="Permalink to this headline">¶</a></h3>
+<p>A logging output.</p>
+<p>Possible values:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">stdout</span></code> – Standard output</li>
+<li><code class="docutils literal notranslate"><span class="pre">stderr</span></code> – Standard error output</li>
+<li><code class="docutils literal notranslate"><span class="pre">syslog</span></code> – Syslog</li>
+<li><em>file_name</em> – File</li>
+</ul>
+</div>
+<div class="section" id="server">
+<span id="log-server"></span><h3>server<a class="headerlink" href="#server" title="Permalink to this headline">¶</a></h3>
+<p>Minimum severity level for messages related to general operation of the server
+that are logged.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="control">
+<span id="log-control"></span><h3>control<a class="headerlink" href="#control" title="Permalink to this headline">¶</a></h3>
+<p>Minimum severity level for messages related to server control that are logged.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="zone">
+<span id="log-zone"></span><h3>zone<a class="headerlink" href="#zone" title="Permalink to this headline">¶</a></h3>
+<p>Minimum severity level for messages related to zones that are logged.</p>
+<p><em>Default:</em> not set</p>
+</div>
+<div class="section" id="any">
+<span id="log-any"></span><h3>any<a class="headerlink" href="#any" title="Permalink to this headline">¶</a></h3>
+<p>Minimum severity level for all message types that are logged.</p>
+<p><em>Default:</em> not set</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Configuration Reference</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#comments">Comments</a></li>
+<li><a class="reference internal" href="#includes">Includes</a></li>
+<li><a class="reference internal" href="#module-section">Module section</a><ul>
+<li><a class="reference internal" href="#module-id">id</a></li>
+<li><a class="reference internal" href="#file">file</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#server-section">Server section</a><ul>
+<li><a class="reference internal" href="#server-identity">identity</a></li>
+<li><a class="reference internal" href="#version">version</a></li>
+<li><a class="reference internal" href="#nsid">nsid</a></li>
+<li><a class="reference internal" href="#rundir">rundir</a></li>
+<li><a class="reference internal" href="#user">user</a></li>
+<li><a class="reference internal" href="#pidfile">pidfile</a></li>
+<li><a class="reference internal" href="#udp-workers">udp-workers</a></li>
+<li><a class="reference internal" href="#tcp-workers">tcp-workers</a></li>
+<li><a class="reference internal" href="#background-workers">background-workers</a></li>
+<li><a class="reference internal" href="#async-start">async-start</a></li>
+<li><a class="reference internal" href="#tcp-handshake-timeout">tcp-handshake-timeout</a></li>
+<li><a class="reference internal" href="#tcp-idle-timeout">tcp-idle-timeout</a></li>
+<li><a class="reference internal" href="#tcp-reply-timeout">tcp-reply-timeout</a></li>
+<li><a class="reference internal" href="#max-tcp-clients">max-tcp-clients</a></li>
+<li><a class="reference internal" href="#max-udp-payload">max-udp-payload</a></li>
+<li><a class="reference internal" href="#max-ipv4-udp-payload">max-ipv4-udp-payload</a></li>
+<li><a class="reference internal" href="#max-ipv6-udp-payload">max-ipv6-udp-payload</a></li>
+<li><a class="reference internal" href="#edns-client-subnet">edns-client-subnet</a></li>
+<li><a class="reference internal" href="#answer-rotation">answer-rotation</a></li>
+<li><a class="reference internal" href="#listen">listen</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#key-section">Key section</a><ul>
+<li><a class="reference internal" href="#key-id">id</a></li>
+<li><a class="reference internal" href="#algorithm">algorithm</a></li>
+<li><a class="reference internal" href="#secret">secret</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#acl-section">ACL section</a><ul>
+<li><a class="reference internal" href="#acl-id">id</a></li>
+<li><a class="reference internal" href="#address">address</a></li>
+<li><a class="reference internal" href="#key">key</a></li>
+<li><a class="reference internal" href="#action">action</a></li>
+<li><a class="reference internal" href="#deny">deny</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#control-section">Control section</a><ul>
+<li><a class="reference internal" href="#control-listen">listen</a></li>
+<li><a class="reference internal" href="#timeout">timeout</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#statistics-section">Statistics section</a><ul>
+<li><a class="reference internal" href="#timer">timer</a></li>
+<li><a class="reference internal" href="#statistics-file">file</a></li>
+<li><a class="reference internal" href="#append">append</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#keystore-section">Keystore section</a><ul>
+<li><a class="reference internal" href="#keystore-id">id</a></li>
+<li><a class="reference internal" href="#backend">backend</a></li>
+<li><a class="reference internal" href="#config">config</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#submission-section">Submission section</a><ul>
+<li><a class="reference internal" href="#submission-id">id</a></li>
+<li><a class="reference internal" href="#parent">parent</a></li>
+<li><a class="reference internal" href="#check-interval">check-interval</a></li>
+<li><a class="reference internal" href="#submission-timeout">timeout</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#policy-section">Policy section</a><ul>
+<li><a class="reference internal" href="#policy-id">id</a></li>
+<li><a class="reference internal" href="#keystore">keystore</a></li>
+<li><a class="reference internal" href="#manual">manual</a></li>
+<li><a class="reference internal" href="#single-type-signing">single-type-signing</a></li>
+<li><a class="reference internal" href="#policy-algorithm">algorithm</a></li>
+<li><a class="reference internal" href="#ksk-size">ksk-size</a></li>
+<li><a class="reference internal" href="#zsk-size">zsk-size</a></li>
+<li><a class="reference internal" href="#ksk-shared">ksk-shared</a></li>
+<li><a class="reference internal" href="#dnskey-ttl">dnskey-ttl</a></li>
+<li><a class="reference internal" href="#zsk-lifetime">zsk-lifetime</a></li>
+<li><a class="reference internal" href="#ksk-lifetime">ksk-lifetime</a></li>
+<li><a class="reference internal" href="#propagation-delay">propagation-delay</a></li>
+<li><a class="reference internal" href="#rrsig-lifetime">rrsig-lifetime</a></li>
+<li><a class="reference internal" href="#rrsig-refresh">rrsig-refresh</a></li>
+<li><a class="reference internal" href="#nsec3">nsec3</a></li>
+<li><a class="reference internal" href="#nsec3-iterations">nsec3-iterations</a></li>
+<li><a class="reference internal" href="#nsec3-opt-out">nsec3-opt-out</a></li>
+<li><a class="reference internal" href="#nsec3-salt-length">nsec3-salt-length</a></li>
+<li><a class="reference internal" href="#nsec3-salt-lifetime">nsec3-salt-lifetime</a></li>
+<li><a class="reference internal" href="#ksk-submission">ksk-submission</a></li>
+<li><a class="reference internal" href="#cds-cdnskey-publish">cds-cdnskey-publish</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#remote-section">Remote section</a><ul>
+<li><a class="reference internal" href="#remote-id">id</a></li>
+<li><a class="reference internal" href="#remote-address">address</a></li>
+<li><a class="reference internal" href="#via">via</a></li>
+<li><a class="reference internal" href="#remote-key">key</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#template-section">Template section</a><ul>
+<li><a class="reference internal" href="#template-id">id</a></li>
+<li><a class="reference internal" href="#timer-db">timer-db</a></li>
+<li><a class="reference internal" href="#max-timer-db-size">max-timer-db-size</a></li>
+<li><a class="reference internal" href="#journal-db">journal-db</a></li>
+<li><a class="reference internal" href="#journal-db-mode">journal-db-mode</a></li>
+<li><a class="reference internal" href="#max-journal-db-size">max-journal-db-size</a></li>
+<li><a class="reference internal" href="#kasp-db">kasp-db</a></li>
+<li><a class="reference internal" href="#max-kasp-db-size">max-kasp-db-size</a></li>
+<li><a class="reference internal" href="#global-module">global-module</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zone-section">Zone section</a><ul>
+<li><a class="reference internal" href="#domain">domain</a></li>
+<li><a class="reference internal" href="#template">template</a></li>
+<li><a class="reference internal" href="#storage">storage</a></li>
+<li><a class="reference internal" href="#zone-file">file</a></li>
+<li><a class="reference internal" href="#master">master</a></li>
+<li><a class="reference internal" href="#ddns-master">ddns-master</a></li>
+<li><a class="reference internal" href="#notify">notify</a></li>
+<li><a class="reference internal" href="#acl">acl</a></li>
+<li><a class="reference internal" href="#semantic-checks">semantic-checks</a></li>
+<li><a class="reference internal" href="#disable-any">disable-any</a></li>
+<li><a class="reference internal" href="#zonefile-sync">zonefile-sync</a></li>
+<li><a class="reference internal" href="#zonefile-load">zonefile-load</a></li>
+<li><a class="reference internal" href="#journal-content">journal-content</a></li>
+<li><a class="reference internal" href="#max-journal-usage">max-journal-usage</a></li>
+<li><a class="reference internal" href="#max-journal-depth">max-journal-depth</a></li>
+<li><a class="reference internal" href="#max-zone-size">max-zone-size</a></li>
+<li><a class="reference internal" href="#dnssec-signing">dnssec-signing</a></li>
+<li><a class="reference internal" href="#dnssec-policy">dnssec-policy</a></li>
+<li><a class="reference internal" href="#request-edns-option">request-edns-option</a></li>
+<li><a class="reference internal" href="#serial-policy">serial-policy</a></li>
+<li><a class="reference internal" href="#min-refresh-interval">min-refresh-interval</a></li>
+<li><a class="reference internal" href="#max-refresh-interval">max-refresh-interval</a></li>
+<li><a class="reference internal" href="#module">module</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#logging-section">Logging section</a><ul>
+<li><a class="reference internal" href="#target">target</a></li>
+<li><a class="reference internal" href="#server">server</a></li>
+<li><a class="reference internal" href="#control">control</a></li>
+<li><a class="reference internal" href="#zone">zone</a></li>
+<li><a class="reference internal" href="#any">any</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="troubleshooting.html"
+                        title="previous chapter">Troubleshooting</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="utilities.html"
+                        title="next chapter">Utilities</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/reference.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="utilities.html" title="Utilities"
+             >next</a></li>
+        <li class="right" >
+          <a href="troubleshooting.html" title="Troubleshooting"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Knot DNS  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright 2010–2018, CZ.NIC, z.s.p.o..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>
